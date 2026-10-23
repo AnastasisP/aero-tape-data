@@ -1,6 +1,16 @@
 {
   "schemaVersion": 1,
   "files": {
+    "1/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "23cfb08aff4534888f09a9af49a5702651bf420226b37367f60fee05d27070f3",
+      "bytes": 68072,
+      "lines": 240
+    },
+    "1/allocation-change/2026-10/2026-10-23.jsonl": {
+      "sha256": "3cfd54ff4a7ad78409ac39db58f4c51ca49c1cad074ec351067f05c408c56e92",
+      "bytes": 2274,
+      "lines": 8
+    },
     "1/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "164237a856d7503b2dcc7c384ecc289661252645ab00c347ed5ff14c45bc7c31",
       "bytes": 23856,
@@ -30,6 +40,16 @@
       "sha256": "b2491a034cc32802bc49a2494d55e9ba38976183a1633c77159045b8a6687681",
       "bytes": 11700,
       "lines": 15
+    },
+    "10/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "1b37125302fdb2315d33b650842a4b61510f80b1726b7e20d26c00ce5b3ef361",
+      "bytes": 57285,
+      "lines": 202
+    },
+    "10/allocation-change/2026-10/2026-10-23.jsonl": {
+      "sha256": "c4ecb6068e99abc63f78f8b0468218a7f87ddef2a66e691d552360c26aa0a657",
+      "bytes": 10269,
+      "lines": 36
     },
     "10/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "bec182a322ea49af61c6e910f87791fb4311c787c0571b46df52d37628ac9c0d",
@@ -66,6 +86,16 @@
       "bytes": 11723,
       "lines": 15
     },
+    "42161/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "5df2d5dd226d82943c83ed9a9bbedf5b63e64038f68d496d4971b259e1ff170c",
+      "bytes": 33046,
+      "lines": 115
+    },
+    "42161/allocation-change/2026-10/2026-10-23.jsonl": {
+      "sha256": "a05139766d86f4183d8770c8167faffedbc4006f4fa06302e9e51b33862f392f",
+      "bytes": 1154,
+      "lines": 4
+    },
     "42161/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "2126a5ecc941a029b328ae82d73b9aa06c3898fb14fcd6e7e1adb96538411996",
       "bytes": 12930,
@@ -95,6 +125,11 @@
       "sha256": "f2922f24bce7e46b790b0c365f1cd9f2b65782d9029ebdf7ca507148aa38b42f",
       "bytes": 11760,
       "lines": 15
+    },
+    "4663/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "8787e9074b1a6a31934567ec8da07abed4de28336241280127749353ab477028",
+      "bytes": 212513,
+      "lines": 743
     },
     "4663/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "8d1f87b38748a875b7726663601ee8ec6462ceee3bba439c850ccff6406efc78",
@@ -126,6 +161,16 @@
       "bytes": 11745,
       "lines": 15
     },
+    "5042/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "c38a9ff24d7327686b08ec90907743e1202283e2cd22f1a6b32a0ce7facebcb9",
+      "bytes": 26296,
+      "lines": 92
+    },
+    "5042/allocation-change/2026-10/2026-10-23.jsonl": {
+      "sha256": "400b556c398e6aae48c6a053e1c48088f4c5bdd37025405e38a1010fedfc8824",
+      "bytes": 2864,
+      "lines": 10
+    },
     "5042/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "f1cb6aaeaf8dfe735fc2a82fabc2f606e711b9c48f7115dd4dd3cfb3014ee850",
       "bytes": 3003,
@@ -156,6 +201,16 @@
       "bytes": 11745,
       "lines": 15
     },
+    "57073/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "650f8219d12d5c050c6cdc15ed911bc775ac7de05d8d078966cf3c5a75c198a9",
+      "bytes": 5976,
+      "lines": 21
+    },
+    "57073/allocation-change/2026-10/2026-10-23.jsonl": {
+      "sha256": "4c98c9d79e78cddde443c95120c654258a6825c7bf28dc77bc2a52a44eb3d1bd",
+      "bytes": 1143,
+      "lines": 4
+    },
     "57073/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "655d097ae4e363d94c73421a9102d3f069b2415f0f4d8ea02c1d947e8188be52",
       "bytes": 5590,
@@ -180,6 +235,16 @@
       "sha256": "dbef54c3b2cca03ea4dcc9b38b887763440b5f6191254f86593bc3a9903e1304",
       "bytes": 11670,
       "lines": 15
+    },
+    "8453/allocation-change/2026-10/2026-10-22.jsonl": {
+      "sha256": "d6ac0346030a6ac9b45443e564369fcf6858e1c61a1cbdced3cf8f43d690e6c0",
+      "bytes": 2765853,
+      "lines": 9670
+    },
+    "8453/allocation-change/2026-10/2026-10-23.jsonl": {
+      "sha256": "03e62b72874414808ab8c70255d8199b971762b256b0500559ae8f0d62024be4",
+      "bytes": 716136,
+      "lines": 2503
     },
     "8453/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "cca908d4f7409dab3ed609346e76072a64fd4a435162e445b95427641c3e8df1",
@@ -877,5 +942,32 @@
       "0x06c0f1069acfe6dc5303955b754c9a801d364c33": "0x9f6437c29256cd8c7e4e9fcae517e145631f0045,0x4108548b95cd6cbdd5dfbe492ba85490e86de0eb,0x4200000000000000000000000000000000000006,0xf1815bd50389c46847f0bda824ec8da914045d14",
       "0x31a53aa1fdce32b8107e040589c8d860e6178ff2": "0x4b4400cc500bef917fcff65aa98ca94bee25512e,0xecb0e6fcb42ef4376f70e5b8d56aab80efc22275,0x0200c29006150606b650577bbe7b6248f58470c1,0xf50258d3c1dd88946c567920b986a12e65b50dac"
     }
-  }
+  },
+  "metricCursors": {
+    "1": {
+      "allocation-change": 1792764000
+    },
+    "10": {
+      "allocation-change": 1792764000
+    },
+    "4663": {
+      "allocation-change": 1792702800
+    },
+    "5042": {
+      "allocation-change": 1792764000
+    },
+    "8453": {
+      "allocation-change": 1792764000
+    },
+    "42161": {
+      "allocation-change": 1792764000
+    },
+    "57073": {
+      "allocation-change": 1792764000
+    }
+  },
+  "slopeChanges": {},
+  "relays": {},
+  "tokens": {},
+  "feeCheckpoints": {}
 }
