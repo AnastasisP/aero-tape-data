@@ -68,7 +68,7 @@ for (const chain of chains) {
       firstHour: points[0].bucket,
       lastHour: last.bucket,
       // the newest hour, for market-wide views (water level, A20): class D, token-native
-      latest: serialize({ bucket: last.bucket, blockNumber: last.blockNumber, weight: last.weight, voteSupply: last.voteSupply, yieldPerWeight: last.yieldPerWeight }),
+      latest: serialize({ bucket: last.bucket, blockNumber: last.blockNumber, weight: last.weight, voteSupply: last.voteSupply, yieldPerWeight: last.yieldPerWeight, weightFlow: last.weightFlow, allocators: last.allocators, allocatedAmount: last.allocatedAmount, relayAllocatedAmount: last.relayAllocatedAmount }),
     };
     for (const tf of Object.keys(TIMEFRAMES)) {
       for (const c of aggregate(points, tf)) {
