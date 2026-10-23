@@ -43,16 +43,19 @@ export async function multicallAt(client, blockNumber, contracts, chunk = 500) {
   return out;
 }
 
-const ATTEMPTS = 4;
+const ATTEMPTS = 6;
 
-/** Retries a transient RPC failure with backoff (2s, 4s, 8s). Public endpoints drop requests. */
+/**
+ * Retries a transient RPC failure with backoff (2, 4, 8, 16, 32 s; at most 60 s). Public
+ * endpoints drop or rate-limit requests, more so from shared CI runner addresses.
+ */
 export async function withRetry(fn) {
   for (let attempt = 1; ; attempt++) {
     try {
       return await fn();
     } catch (err) {
       if (attempt >= ATTEMPTS) throw err;
-      await new Promise((r) => setTimeout(r, 1000 * 2 ** attempt));
+      await new Promise((r) => setTimeout(r, Math.min(60_000, 1000 * 2 ** attempt)));
     }
   }
 }

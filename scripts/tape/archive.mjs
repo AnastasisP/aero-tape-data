@@ -138,7 +138,7 @@ await Promise.all(
     } catch (err) {
       failed = true;
       runStatus[chain.chainId] = { ok: false, error: String(err.shortMessage ?? err.message).slice(0, 200), cursor: store.cursor(chain.chainId) };
-      console.error(`${chain.slug}: FAILED after ${written} hours: ${err.shortMessage ?? err.message}`);
+      console.error(`${chain.slug}: FAILED after ${written} hours: ${err.shortMessage ?? err.message} ${err.details ?? ""}`.trim());
       if (process.env.TAPE_DEBUG) console.error(err);
     }
   }),
