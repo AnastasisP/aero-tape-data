@@ -59,7 +59,17 @@ for (const chain of chains) {
   const files = new Map(); // rel -> { gauge -> candles }
   for (const [gauge, points] of series) {
     const reg = registry.get(gauge);
-    gauges[gauge] = { pool: reg?.pool ?? null, rewards: reg?.rewards ?? null, token0: reg?.token0 ?? null, token1: reg?.token1 ?? null, firstHour: points[0].bucket, lastHour: points.at(-1).bucket };
+    const last = points.at(-1);
+    gauges[gauge] = {
+      pool: reg?.pool ?? null,
+      rewards: reg?.rewards ?? null,
+      token0: reg?.token0 ?? null,
+      token1: reg?.token1 ?? null,
+      firstHour: points[0].bucket,
+      lastHour: last.bucket,
+      // the newest hour, for market-wide views (water level, A20): class D, token-native
+      latest: serialize({ bucket: last.bucket, blockNumber: last.blockNumber, weight: last.weight, voteSupply: last.voteSupply, yieldPerWeight: last.yieldPerWeight }),
+    };
     for (const tf of Object.keys(TIMEFRAMES)) {
       for (const c of aggregate(points, tf)) {
         const rel = `${chain.chainId}/${tf}/${new Date(c.bucket * 1000).toISOString().slice(0, PERIOD[tf])}.json`;
