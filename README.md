@@ -10,6 +10,7 @@ Goal and definitions: `specs/goal/ALLOCATION-TAPE-GOAL.md` on `main`.
 - Sample for hour H = state read at the first block whose timestamp is >= H.
   Every line carries `schemaVersion`, `chainId`, `blockNumber`, `blockTimestamp`,
   `bucket` (= H), `source`, `class`. Amounts are decimal strings (wei, no floats).
+- `vercel.json` stops Vercel from building this branch.
 - Metrics: `gauge-state`, `gauge-registry`, `incentive-program`, `leaf-state`,
   `root-state` (Base only). Raw chain reads only (class E). Nothing here is a forecast.
 - Lines are only ever appended. Reproduce any line with an `eth_call` at its
