@@ -125,12 +125,18 @@ for (const chain of chains) {
   console.log(`schema: ${checked} records since ${since}`);
 }
 
-// 3. freshness
+// 3. freshness. A chain whose last archive run failed on its RPC is Frozen: reported,
+//    not failed (its hours resume, gap-free, when the RPC answers again).
+const lastRun = store.readState("all", "run")?.chains ?? {};
 if (!offline) {
   await Promise.all(
     chains.map(async (chain) => {
       const cursor = store.cursor(chain.chainId);
       if (cursor === null) return;
+      if (lastRun[chain.chainId] && !lastRun[chain.chainId].ok) {
+        console.log(`${chain.slug}: frozen (last run: ${lastRun[chain.chainId].error ?? "RPC failure"}); cursor ${new Date(cursor * 1000).toISOString()}`);
+        return;
+      }
       try {
         const head = await safeHead(clientFor(chain));
         const lag = (Math.floor(Number(head.timestamp) / HOUR) * HOUR - cursor) / HOUR;

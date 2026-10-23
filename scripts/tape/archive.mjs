@@ -3,8 +3,10 @@
 //   node scripts/tape/archive.mjs --out <dir> [--max-hours 48] [--chains base,arc]
 // First run starts at Minter.ACTIVATION_TIMESTAMP (read on-chain). A missed run is
 // healed by the next one (archive-state reads at past blocks), up to --max-hours
-// per chain per run. A chain that fails keeps the hours already written; the run
-// then exits 1 so the workflow is red.
+// per chain per run. A chain whose RPC fails keeps the hours already written and is
+// recorded as failed in state/all/run.json (data state Frozen); the other chains
+// carry on and the run exits 0. Only a run where every chain fails exits 1
+// (operator 2026-10-23: one chain's RPC must not fail the run).
 import { loadChains, loadDeployments } from "./registry-lib.mjs";
 import { clientFor, withRetry } from "./client.mjs";
 import { firstBlockAtOrAfter, safeHead } from "./blocks.mjs";
@@ -146,4 +148,6 @@ await Promise.all(
 // The last run's outcome per chain, for the data state (Frozen when a chain's run failed).
 const prevRun = store.readState("all", "run") ?? { chains: {} };
 store.writeState("all", "run", { chains: { ...prevRun.chains, ...runStatus } });
-process.exit(failed ? 1 : 0);
+const failedChains = Object.entries(runStatus).filter(([, r]) => !r.ok).map(([id]) => id);
+if (failedChains.length) console.log(`frozen this run (RPC failure, recorded): ${failedChains.join(", ")}`);
+process.exit(failed && failedChains.length === chains.length ? 1 : 0);
