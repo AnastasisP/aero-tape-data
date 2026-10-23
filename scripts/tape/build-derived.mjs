@@ -14,6 +14,7 @@ import { TapeStore } from "./store.mjs";
 import { SERIES_META, TIMEFRAMES, aggregate, deriveHourly, serialize } from "../../lib/data/aero-v3/tape/series.mjs";
 import { resolvePoint } from "../../lib/data/aero-v3/tape/points.mjs";
 import { fetchPrices, priceKey } from "./prices.mjs";
+import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.mjs";
 
 export const DERIVED_VERSION = "v1";
 const PERIOD = { "1h": 10, "4h": 10, "1d": 7, "1w": 4 }; // ISO date prefix length per file
@@ -104,6 +105,25 @@ for (const chain of chains) {
   };
 }
 
+// Global hourly series (A26): total, allocated, idle, mobile VP, per chain booked / mobile.
+const mobility = {};
+for (const chain of chains) {
+  const through = Math.min(store.metricCursor(chain.chainId, "allocation-change") ?? -1, store.metricCursor(chain.chainId, "token-leaf-state") ?? -1);
+  if (through < 0) continue;
+  mobility[chain.chainId] = chainMobility(rowsOf(chain.chainId, ["allocation-change", "token-leaf-state", "leaf-state"]), through);
+}
+const global = globalSeries(rowsOf(root.chainId, ["root-state"]), mobility);
+const byDay = new Map();
+for (const g of global) {
+  const day = new Date(g.bucket * 1000).toISOString().slice(0, 10);
+  if (!byDay.has(day)) byDay.set(day, []);
+  byDay.get(day).push(g);
+}
+for (const [day, points] of byDay) {
+  if (writeJson(`global/1h/${day}.json`, { schemaVersion: 1, tf: "1h", period: day, source: "chain", class: "D", points: serialize(points) })) written++;
+}
+const newestGlobal = global.at(-1);
+
 // Market state at the newest root hour (goal §5c, §6): total, allocated, idle VP, chain budgets.
 const rootRows = rowsOf(root.chainId, ["root-state"]);
 const last = rootRows.at(-1);
@@ -134,6 +154,8 @@ if (last) {
     emissionRate: last.minter.emissionRate,
     chainBudgets: budgets,
     relays: relayRows.map((r) => ({ relay: r.relay, tokenId: r.tokenId, name: r.name, relayType: r.relayType })),
+    // A26: allocated VP that can move now (cooldown elapsed), at the same hour when available
+    mobile: newestGlobal && newestGlobal.bucket === last.bucket && newestGlobal.mobile !== null ? newestGlobal.mobile.toString() : null,
   };
 }
 // Last archiver run per chain (Frozen data state when it failed).

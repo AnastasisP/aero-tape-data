@@ -37,4 +37,28 @@ export async function readLeafAllocations(client, leafVoter, block, tokenIds) {
   return out;
 }
 
-export { allocationRows, allocatorCounts, gaugeAllocationStats, replayAllocations } from "../../lib/data/aero-v3/tape/allocations.mjs";
+/**
+ * Leaf token states that decide mobility and the booked shape (A26): lastAllocated,
+ * the accumulated cooldown reduction, and the tokenSnapshot (stakeEnd, isPermanent)
+ * the leaf books allocations against.
+ * @returns Map tokenId -> "lastAllocated,reduction,stakeEnd,isPermanent"
+ */
+export async function readLeafTokenStates(client, leafVoter, block, tokenIds) {
+  const ids = [...tokenIds];
+  const res = await multicallAt(
+    client,
+    block,
+    ids.flatMap((id) => [at(leafVoter, "tokenStates", [BigInt(id)]), at(leafVoter, "accumulatedCooldownReduction", [BigInt(id)]), at(leafVoter, "tokenSnapshot", [BigInt(id)])]),
+    CHUNK,
+  );
+  const out = new Map();
+  ids.forEach((id, i) => {
+    const st = res[3 * i];
+    const red = res[3 * i + 1];
+    const snap = res[3 * i + 2];
+    out.set(id, [Number(st[1]), Number(red), Number(snap[1]), snap[2] ? 1 : 0].join(","));
+  });
+  return out;
+}
+
+export { allocationRows, allocatorCounts, gaugeAllocationStats, replayAllocations, tokenStateRows, replayTokenStates } from "../../lib/data/aero-v3/tape/allocations.mjs";

@@ -5,7 +5,7 @@ import { loadChains } from "./registry-lib.mjs";
 
 export const TAPE_SCHEMA_VERSION = 1;
 export const TAPE_CLASSES = new Set(["E", "D", "P", "S"]);
-export const TAPE_METRICS = new Set(["gauge-state", "gauge-registry", "incentive-program", "fee-checkpoint", "allocation-change", "gauge-slope-change", "relay-registry", "token-registry", "leaf-state", "root-state"]);
+export const TAPE_METRICS = new Set(["gauge-state", "gauge-registry", "incentive-program", "fee-checkpoint", "allocation-change", "gauge-slope-change", "relay-registry", "token-registry", "token-leaf-state", "leaf-state", "root-state"]);
 const SOURCE = /^chain(\+price:[a-z0-9][a-z0-9-]*)?$/;
 const ADDRESS = /^0x[0-9a-f]{40}$/;
 const UINT = /^[0-9]+$/;
@@ -25,6 +25,7 @@ const REQUIRED = {
   "gauge-slope-change": { gauge: "address", boundary: "posint", slopeDelta: "int" },
   "relay-registry": { relay: "address", factory: "address", tokenId: "uintstr", relayType: "int" },
   "token-registry": { token: "address" },
+  "token-leaf-state": { tokenId: "uintstr", kind: "kind", lastAllocated: "int", cooldownReduction: "int", stakeEnd: "int" },
   "leaf-state": { leafVoter: "address", zeroGaugeState: "object", index: "uint", emissionsPerVP: "uint", allocationCooldown: "posint" },
   "root-state": { votingEscrow: "object", voter: "object", chainStates: "array", minter: "object" },
 };

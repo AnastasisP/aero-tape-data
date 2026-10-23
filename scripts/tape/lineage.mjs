@@ -84,6 +84,7 @@ export const FIELD_SIDES = Object.freeze({
   "gauge-slope-change": { gauge: C, boundary: C, slopeDelta: W },
   "relay-registry": { relay: C, factory: C, tokenId: C, relayType: C, name: C },
   "token-registry": { token: C, decimals: C, symbol: C },
+  "token-leaf-state": { tokenId: C, kind: C, gone: C, lastAllocated: C, cooldownReduction: C, stakeEnd: W, isPermanent: W },
   "leaf-state": {
     leafVoter: C,
     ...gaugeStateSides("zeroGaugeState"),

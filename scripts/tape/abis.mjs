@@ -97,6 +97,9 @@ export const allocationAbi = parseAbi([
   "function allocationChainIds(uint256) view returns (uint256[])",
   "function allocatedGauges(uint256) view returns (address[])",
   "function allocations(uint256, address) view returns (uint128)",
+  "function tokenStates(uint256) view returns (address operator, uint48 lastAllocated, bool canVoteForZeroCapGauges, uint128 chainAllocation)",
+  "function accumulatedCooldownReduction(uint256) view returns (uint48)",
+  "function tokenSnapshot(uint256) view returns (uint128 staked, uint48 stakeEnd, bool isPermanent)",
 ]);
 
 export const relayAbi = parseAbi([
