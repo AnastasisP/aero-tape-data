@@ -1,17 +1,19 @@
-# Allocation Tape — data branch
+# aero-tape-data — data branch
 
-Append-only hourly samples of the Aero v3 allocation market, written by
-`.github/workflows/tape-archive.yml` on `main` (code: `scripts/tape/`).
-Goal and definitions: `specs/goal/ALLOCATION-TAPE-GOAL.md` on `main`.
+The tape: hourly, append-only samples of the Aero v3 allocation market on 7 chains,
+written by `.github/workflows/archive.yml` on the `main` branch of this repository.
 
-- Layout: `v1/<chainId>/<metric>/<yyyy-mm>/<yyyy-mm-dd>.jsonl`, one JSON object per line.
-- `v1/manifest.json`: sha256, byte length and line count of every file, plus each
-  chain's last archived hour (`cursors`).
-- Sample for hour H = state read at the first block whose timestamp is >= H.
-  Every line carries `schemaVersion`, `chainId`, `blockNumber`, `blockTimestamp`,
-  `bucket` (= H), `source`, `class`. Amounts are decimal strings (wei, no floats).
-- `vercel.json` stops Vercel from building this branch.
-- Metrics: `gauge-state`, `gauge-registry`, `incentive-program`, `leaf-state`,
-  `root-state` (Base only). Raw chain reads only (class E). Nothing here is a forecast.
-- Lines are only ever appended. Reproduce any line with an `eth_call` at its
-  `blockNumber` on its `chainId`.
+- Raw: `v1/<chainId>/<metric>/<yyyy-mm>/<yyyy-mm-dd>.jsonl`, one JSON object per line.
+  Metrics: `gauge-state`, `gauge-registry`, `incentive-program`, `fee-checkpoint`,
+  `allocation-change`, `gauge-slope-change`, `relay-registry`, `token-registry`,
+  `leaf-state`, `root-state` (Base only).
+- `v1/manifest.json`: sha256, byte length and line count of every file, each chain's last
+  archived hour (`cursors`) and per-metric cursors.
+- `derived/v1/`: candles of the core series per gauge (1h, 4h, 1d, 1w) and `index.json`.
+- `state/`: working state of the archiver (not tape data).
+
+The sample for hour H is read at the first block whose timestamp is >= H. Every line
+carries `schemaVersion`, `chainId`, `blockNumber`, `blockTimestamp`, `bucket`, `source`,
+`class`; amounts are decimal strings in base units. Lines are only ever appended.
+History before 2026-10-23T14:33Z was written in a private repository and moved here
+unchanged.
