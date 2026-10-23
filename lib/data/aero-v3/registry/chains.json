@@ -1,0 +1,69 @@
+{
+  "_comment": "The 7 Aero v3 chains. slug = the suffix of the upstream deployment-addresses/<group>-<slug>.json files. chainId verified with eth_chainId on 2026-10-23. rpcs = public endpoints, no key, in fallback order; every one must serve historical state (eth_call at a past block), checked 2026-10-23 at 2h/40h/47h back. Override per chain with TAPE_RPC_<SLUG> (comma-separated).",
+  "chains": [
+    {
+      "slug": "base",
+      "chainId": 8453,
+      "name": "Base",
+      "role": "root",
+      "rpcs": [
+        "https://mainnet.base.org"
+      ]
+    },
+    {
+      "slug": "optimism",
+      "chainId": 10,
+      "name": "OP Mainnet",
+      "role": "leaf",
+      "rpcs": [
+        "https://mainnet.optimism.io"
+      ]
+    },
+    {
+      "slug": "ethereum",
+      "chainId": 1,
+      "name": "Ethereum",
+      "role": "leaf",
+      "rpcs": [
+        "https://eth.drpc.org"
+      ]
+    },
+    {
+      "slug": "arbitrum",
+      "chainId": 42161,
+      "name": "Arbitrum One",
+      "role": "leaf",
+      "rpcs": [
+        "https://arbitrum.gateway.tenderly.co",
+        "https://arbitrum-one.public.blastapi.io"
+      ]
+    },
+    {
+      "slug": "ink",
+      "chainId": 57073,
+      "name": "Ink",
+      "role": "leaf",
+      "rpcs": [
+        "https://rpc-gel.inkonchain.com"
+      ]
+    },
+    {
+      "slug": "robinhood",
+      "chainId": 4663,
+      "name": "Robinhood Chain",
+      "role": "leaf",
+      "rpcs": [
+        "https://robinhood.drpc.org"
+      ]
+    },
+    {
+      "slug": "arc",
+      "chainId": 5042,
+      "name": "Arc",
+      "role": "leaf",
+      "rpcs": [
+        "https://rpc.mainnet.arc.io"
+      ]
+    }
+  ]
+}

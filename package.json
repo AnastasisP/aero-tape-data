@@ -1,0 +1,24 @@
+{
+  "name": "aero-tape-data",
+  "private": true,
+  "type": "module",
+  "description": "Archiver and verifiers of the Aero v3 allocation tape. Data lives on the data branch.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "viem": "2.48.11"
+  },
+  "scripts": {
+    "archive": "node scripts/tape/archive.mjs",
+    "verify-archive": "node scripts/tape/verify-archive.mjs",
+    "verify-exact": "node scripts/tape/verify-exact.mjs",
+    "verify-idle": "node scripts/tape/verify-idle.mjs",
+    "verify-parity": "node scripts/tape/verify-parity.mjs",
+    "verify-coverage": "node scripts/tape/verify-coverage.mjs",
+    "verify-relays": "node scripts/tape/verify-relays.mjs",
+    "verify-prices": "node scripts/tape/verify-prices.mjs",
+    "verify-registry": "node scripts/tape/verify-registry.mjs",
+    "verify-universe": "node scripts/tape/verify-universe.mjs",
+    "build-derived": "node scripts/tape/build-derived.mjs"
+  }
+}

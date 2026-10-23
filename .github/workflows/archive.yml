@@ -1,0 +1,93 @@
+name: archive
+
+# Hourly: append every complete hour since the last archived one to the `data` branch,
+# verify, then push. GitHub may run schedules late or skip them; the next run backfills
+# the gap from archive-state RPC reads (real chain values only, never estimates).
+# A failed integrity check pushes nothing.
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+
+      # Only the manifest, state, derived and the current + previous month of raw files:
+      # older day files are never written again (store.mjs SPARSE_DAYS).
+      - name: Months to check out
+        id: months
+        run: |
+          echo "cur=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+          echo "prev=$(date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: data
+          path: tape-data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /README.md
+            /v1/manifest.json
+            /state/
+            /derived/
+            /v1/*/*/${{ steps.months.outputs.prev }}/
+            /v1/*/*/${{ steps.months.outputs.cur }}/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Archive
+        id: archive
+        continue-on-error: true
+        run: node scripts/tape/archive.mjs --out tape-data --max-hours 48
+
+      - name: Verify (integrity, continuity, append-only)
+        run: node scripts/tape/verify-archive.mjs --dir tape-data --offline
+
+      - name: Exactness (50 random points + one whole hour per chain, re-read at their blocks)
+        run: node scripts/tape/verify-exact.mjs --dir tape-data --sample 50
+
+      - name: Derived candles (read by the app and the MCP server)
+        run: node scripts/tape/build-derived.mjs --dir tape-data --prices
+
+      - name: Push
+        working-directory: tape-data
+        run: |
+          git config user.name "aero-tape-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v1 state derived
+          if git diff --cached --quiet; then
+            echo "nothing new"
+            exit 0
+          fi
+          git commit -q -m "tape: archive run ${GITHUB_RUN_ID}"
+          git push origin HEAD:data
+
+      - name: Idle reconciliation (total = allocated + idle, token by token, newest hour)
+        run: node scripts/tape/verify-idle.mjs --dir tape-data
+
+      - name: Protocol parity (fee revenue from the tape == earnedFees, 25 veNFTs)
+        run: node scripts/tape/verify-parity.mjs --dir tape-data --tokens 25
+
+      - name: Freshness (every chain within 3h of its head)
+        run: node scripts/tape/verify-archive.mjs --dir tape-data
+
+      - name: Fail if the archive step failed
+        if: steps.archive.outcome == 'failure'
+        run: exit 1
