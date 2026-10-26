@@ -1096,6 +1096,16 @@
       "bytes": 10416,
       "lines": 24
     },
+    "8453/migration-state/2026-10/2026-10-24.jsonl": {
+      "sha256": "07f9a8dcaea2f5a61c9559625ea28fde3ea14eaf0472e9824ae9894dd561474b",
+      "bytes": 10460,
+      "lines": 24
+    },
+    "8453/migration-state/2026-10/2026-10-25.jsonl": {
+      "sha256": "1d658831162ce2a914cbe450f2c93cb5b181b836aa1cbf325fb20152cbe17fb7",
+      "bytes": 10464,
+      "lines": 24
+    },
     "8453/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "e5cd785338ac4ba3eb766946124b39b8409ce8bb963d7790124d54f50fa1d049",
       "bytes": 5216383,
@@ -1894,7 +1904,7 @@
       "allocation-change": 1792980000,
       "token-leaf-state": 1792980000,
       "pool-state": 1792980000,
-      "migration-state": 1792796400
+      "migration-state": 1792969200
     },
     "42161": {
       "allocation-change": 1792983600,
