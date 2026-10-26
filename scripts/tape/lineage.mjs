@@ -85,6 +85,28 @@ export const FIELD_SIDES = Object.freeze({
   "relay-registry": { relay: C, factory: C, tokenId: C, relayType: C, name: C },
   "token-registry": { token: C, decimals: C, symbol: C },
   "token-leaf-state": { tokenId: C, kind: C, gone: C, lastAllocated: C, cooldownReduction: C, stakeEnd: W, isPermanent: W },
+  // A28: the pool's own balances and tape cumulatives (IPoolTape / ICLPoolTape). What
+  // swappers paid the pool and its LPs; stakers are paid only through FeeDistribution.
+  "pool-state": {
+    gauge: C,
+    pool: C,
+    poolType: C,
+    tape: C,
+    token0: C,
+    token1: C,
+    balance0: L,
+    balance1: L,
+    cumulativeFee0: L,
+    cumulativeFee1: L,
+    cumulativeVolume0: L,
+    cumulativeVolume1: L,
+    cumulativeMevVolume0: L,
+    cumulativeMevVolume1: L,
+    cumulativeMevFee0: L,
+    cumulativeMevFee1: L,
+    lastSwapTimestamp: C,
+    swapCount: L,
+  },
   "leaf-state": {
     leafVoter: C,
     ...gaugeStateSides("zeroGaugeState"),
@@ -146,6 +168,18 @@ export const LP_SIDE_NAMES = Object.freeze([
   "poolFees",
   "claimed",
   "ceiling",
+  "cumulativeFee0",
+  "cumulativeFee1",
+  "cumulativeVolume0",
+  "cumulativeVolume1",
+  "cumulativeMevFee0",
+  "cumulativeMevFee1",
+  "cumulativeMevVolume0",
+  "cumulativeMevVolume1",
+  "poolBalance",
+  "poolSwapFees",
+  "poolVolume",
+  "poolSwaps",
 ]);
 
 const PROVENANCE = new Set(["schemaVersion", "chainId", "blockNumber", "blockTimestamp", "bucket", "source", "class", "metric"]);

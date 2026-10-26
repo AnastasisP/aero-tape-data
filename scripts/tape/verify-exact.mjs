@@ -2,6 +2,7 @@
 // Exactness: archived values equal a fresh read at the recorded block, to the wei.
 //  a. `--sample` random gauge-state lines from the files on disk, each re-read alone
 //  b. one random archived hour per chain, re-read whole (every gauge, leaf, root)
+//  c. `--sample` random pool-state lines (A28, LP-side context), each pool re-read alone
 // Prints the sample so a failure can be replayed. Exit 1 on any mismatch.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -9,6 +10,7 @@ import { loadChains, loadDeployments } from "./registry-lib.mjs";
 import { MULTICALL3, clientFor, multicallAt, withRetry } from "./client.mjs";
 import { multicall3Abi } from "./abis.mjs";
 import { gaugeCalls, gaugeRecordFrom, readHourSnapshot } from "./snapshot.mjs";
+import { readPoolStates } from "./pools.mjs";
 import { TapeStore } from "./store.mjs";
 
 function arg(name, fallback) {
@@ -123,6 +125,22 @@ for (const chain of chains) {
   }
   console.log(`${chain.slug}: hour ${new Date(leaf.bucket * 1000).toISOString()} re-read (${archivedGauges.length} gauges)`);
 }
+
+// c. random pool-state points (A28): same reader, one gauge, at the recorded block
+const poolFiles = onDisk("/pool-state/");
+const poolLines = poolFiles.flatMap(([rel]) => lines(rel).map((l, i) => ({ rel, i, l })));
+let poolPoints = 0;
+for (let n = 0; n < sampleSize && poolLines.length; n++) {
+  const { rel, i, l } = poolLines[Math.floor(rand() * poolLines.length)];
+  const rec = JSON.parse(l);
+  const chain = byId.get(rec.chainId);
+  const prov = { schemaVersion: rec.schemaVersion, chainId: rec.chainId, blockNumber: rec.blockNumber, blockTimestamp: rec.blockTimestamp, bucket: rec.bucket, source: rec.source, class: rec.class };
+  const { rows } = await withRetry(() => readPoolStates(clientFor(chain), BigInt(rec.blockNumber), prov, new Map([[rec.gauge, `${rec.pool},,,`]])));
+  if (rows.length !== 1) failures.push(`${rel}:${i + 1}: pool ${rec.pool} has no readable tape at ${rec.blockNumber}`);
+  else compare(`${chain.slug} pool ${rec.pool} @${rec.blockNumber}`, rec, rows[0]);
+  poolPoints++;
+}
+console.log(`${poolPoints} pool-state points re-read`);
 
 if (failures.length) {
   console.error(`\nA5 FAIL (seed ${startSeed}): ${failures.length} mismatch(es)`);

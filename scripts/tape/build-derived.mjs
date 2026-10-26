@@ -6,6 +6,7 @@
 // Unpriced data state; the tape itself never stores an estimated price.
 // Output under <dir>/derived/v1:
 //   <chainId>/<tf>/<period>.json   1h and 4h per UTC day, 1d per month, 1w per year
+//   <chainId>/lp/<tf>/<period>.json LP-side pool context (A28), same periods, never staker revenue
 //   index.json                      gauges (tokens, pool, hours) and the market state
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -15,6 +16,7 @@ import { SERIES_META, TIMEFRAMES, aggregate, deriveHourly, serialize } from "../
 import { resolvePoint } from "../../lib/data/aero-v3/tape/points.mjs";
 import { fetchPrices, priceKey } from "./prices.mjs";
 import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.mjs";
+import { LP_SERIES_META, LP_SIDE, deriveLpHourly } from "../../lib/data/aero-v3/tape/lpSeries.mjs";
 
 export const DERIVED_VERSION = "v1";
 const PERIOD = { "1h": 10, "4h": 10, "1d": 7, "1w": 4 }; // ISO date prefix length per file
@@ -49,7 +51,7 @@ function writeJson(rel, value) {
 const root = chains.find((c) => c.role === "root");
 const relayRows = rowsOf(root.chainId, ["relay-registry"]);
 const relayTokens = relayRows.length ? new Set(relayRows.map((r) => r.tokenId)) : null;
-const index = { schemaVersion: 1, series: SERIES_META, timeframes: Object.keys(TIMEFRAMES), chains: {}, market: null };
+const index = { schemaVersion: 1, series: SERIES_META, lpSeries: LP_SERIES_META, timeframes: Object.keys(TIMEFRAMES), chains: {}, market: null };
 let written = 0;
 
 for (const chain of chains) {
@@ -92,6 +94,27 @@ for (const chain of chains) {
     };
     if (writeJson(rel, doc)) written++;
   }
+  // A28: LP-side context, its own files so no staker-revenue view reads it by accident.
+  const lp = {};
+  const lpFiles = new Map();
+  const lpRows = rowsOf(chain.chainId, ["pool-state"]);
+  const lpPool = new Map(lpRows.map((r) => [r.gauge, r]));
+  for (const [gauge, points] of deriveLpHourly(lpRows)) {
+    const r = lpPool.get(gauge);
+    lp[gauge] = { pool: r.pool, poolType: r.poolType, tape: r.tape, firstHour: points[0].bucket, lastHour: points.at(-1).bucket };
+    for (const tf of Object.keys(TIMEFRAMES)) {
+      for (const c of aggregate(points, tf, LP_SERIES_META)) {
+        const rel = `${chain.chainId}/lp/${tf}/${new Date(c.bucket * 1000).toISOString().slice(0, PERIOD[tf])}.json`;
+        if (!lpFiles.has(rel)) lpFiles.set(rel, {});
+        (lpFiles.get(rel)[gauge] ??= []).push(c);
+      }
+    }
+  }
+  for (const [rel, byGauge] of lpFiles) {
+    const [, , tf, period] = rel.split("/");
+    const doc = { schemaVersion: 1, chainId: chain.chainId, tf, period: period.replace(".json", ""), source: "chain", side: LP_SIDE, gauges: serialize(Object.fromEntries(Object.entries(byGauge).sort())) };
+    if (writeJson(rel, doc)) written++;
+  }
   index.chains[chain.chainId] = {
     slug: chain.slug,
     name: chain.name,
@@ -102,6 +125,7 @@ for (const chain of chains) {
     // display only: symbol and decimals of fee / incentive tokens (amounts stay in base units)
     tokens: Object.fromEntries(rows.filter((r) => r.metric === "token-registry").map((r) => [r.token, { symbol: r.symbol, decimals: r.decimals }])),
     gauges,
+    lp,
   };
 }
 

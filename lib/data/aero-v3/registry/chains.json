@@ -1,5 +1,5 @@
 {
-  "_comment": "The 7 Aero v3 chains. slug = the suffix of the upstream deployment-addresses/<group>-<slug>.json files. chainId verified with eth_chainId on 2026-10-23. rpcs = public endpoints, no key, in fallback order; every one must serve historical state (eth_call at a past block), checked 2026-10-23 at 2h/40h/47h back. Override per chain with TAPE_RPC_<SLUG> (comma-separated).",
+  "_comment": "The 7 Aero v3 chains. slug = the suffix of the upstream deployment-addresses/<group>-<slug>.json files. chainId verified with eth_chainId on 2026-10-23. rpcs = public endpoints, no key, in fallback order; every one must serve historical state (eth_call at a past block), checked 2026-10-23 at 2h/40h/47h back. Override per chain with TAPE_RPC_<SLUG> (comma-separated). blockNumber = what block.number returns inside a call: absent = this chain's block; \"l1\" = the parent chain's block (Arbitrum Nitro, checked 2026-10-26), so pinned reads there check the block timestamp instead (ArbSys.arbBlockNumber is not served at past blocks by drpc Robinhood).",
   "chains": [
     {
       "slug": "base",
@@ -36,7 +36,8 @@
       "rpcs": [
         "https://arbitrum.gateway.tenderly.co",
         "https://arbitrum-one.public.blastapi.io"
-      ]
+      ],
+      "blockNumber": "l1"
     },
     {
       "slug": "ink",
@@ -54,7 +55,8 @@
       "role": "leaf",
       "rpcs": [
         "https://robinhood.drpc.org"
-      ]
+      ],
+      "blockNumber": "l1"
     },
     {
       "slug": "arc",

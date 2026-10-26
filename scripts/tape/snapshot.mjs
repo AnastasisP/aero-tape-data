@@ -1,7 +1,7 @@
 // One hourly tape sample for one chain at one pinned block. Raw class-E reads only:
 // no derived value, no price. Every record carries the A9 provenance fields.
 import { erc20Abi, factoryRegistryAbi, feeCheckpointAbi, leafStateAbi, multicall3Abi, relayAbi, rewardsAbi, rootStateAbi } from "./abis.mjs";
-import { MULTICALL3, multicallAt } from "./client.mjs";
+import { MULTICALL3, multicallAt, softMulticallAt } from "./client.mjs";
 import { boundariesBetween } from "../../lib/data/aero-v3/tape/points.mjs";
 
 export const SCHEMA_VERSION = 1;
@@ -218,19 +218,18 @@ export async function readHourSnapshot(client, chain, files, block, bucket, know
  */
 async function readTokens(client, block, prov, tokens) {
   if (!tokens.length) return [];
-  const res = await client.multicall({
-    contracts: tokens.flatMap((t) => [
+  const res = await softMulticallAt(
+    client,
+    block,
+    tokens.flatMap((t) => [
       { address: t, abi: erc20Abi, functionName: "decimals" },
       { address: t, abi: erc20Abi, functionName: "symbol" },
     ]),
-    blockNumber: block,
-    allowFailure: true,
-    batchSize: 16_384,
-  });
+  );
   return tokens.map((t, i) => {
     const d = res[2 * i];
     const sym = res[2 * i + 1];
-    return ser({ ...prov, metric: "token-registry", token: t, decimals: d.status === "success" ? Number(d.result) : null, symbol: sym.status === "success" ? String(sym.result).slice(0, 32) : null });
+    return ser({ ...prov, metric: "token-registry", token: t, decimals: d.ok ? Number(d.value) : null, symbol: sym.ok ? String(sym.value).slice(0, 32) : null });
   });
 }
 

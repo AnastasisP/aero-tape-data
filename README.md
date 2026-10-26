@@ -13,7 +13,13 @@ state. Descriptive data only: no forecast, no recommendation.
 Every line carries `schemaVersion`, `chainId`, `blockNumber`, `blockTimestamp`, `bucket`,
 `source`, `class`. The sample for hour H is read at the first block whose timestamp is
 >= H; reproduce any line with an `eth_call` at its `blockNumber`. Amounts are decimal
-strings in base units. Lines are only ever appended.
+strings in base units. Lines are only ever appended. Every read is pinned: each
+`eth_call` also returns the block it executed at (block timestamp on Arbitrum and
+Robinhood, where `block.number` is the parent chain's), and a mismatch is retried.
+
+`pool-state` lines (pool balances and pool-tape cumulative fees / volume / swaps) are
+LP-side context only, never staker revenue; they start 48 hours before the first run that
+archived them.
 
 Checks run on every archive: integrity and continuity (`verify-archive`), exactness of 50
 random points re-read at their blocks (`verify-exact`), total = allocated + idle voting

@@ -43,7 +43,7 @@ const lastBlockAt = (chainId, bucket) => {
 const relayRows = rowsOf(root.chainId, "relay-registry");
 const rootBlock = lastBlockAt(root.chainId, store.cursor(root.chainId));
 const rc = clientFor(root);
-const mc = (client, block, calls) => withRetry(() => multicallAt(client, block, calls, 2000));
+const mc = (client, block, calls) => withRetry(() => multicallAt(client, block, calls));
 const registry = files[`relayfactoryregistry-${root.slug}.json`].addresses.relayFactoryRegistry;
 const [factories] = await mc(rc, rootBlock, [{ address: registry, abi: relayAbi, functionName: "relayFactories" }]);
 const live = [];

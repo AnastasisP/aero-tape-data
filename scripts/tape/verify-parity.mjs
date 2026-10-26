@@ -89,7 +89,7 @@ const ZERO_CP = { ts: 0n, feeReward0: 0n, feeReward1: 0n, feeReward0xTime: 0n, f
 console.log(`tape: Base hour ${new Date(bRow.bucket * 1000).toISOString()} block ${block}, fee checkpoints for ${cps.size} gauges`);
 
 // Tokens with a Base allocation.
-const mc = (calls) => withRetry(() => multicallAt(client, block, calls, 2000));
+const mc = (calls) => withRetry(() => multicallAt(client, block, calls));
 const at = (address, functionName, args) => ({ address, abi, functionName, args });
 const [n] = await mc([at(rf.votingEscrow, "totalSupply")]);
 const ids = await mc(Array.from({ length: Number(n) }, (_, i) => at(rf.votingEscrow, "tokenByIndex", [BigInt(i)])));

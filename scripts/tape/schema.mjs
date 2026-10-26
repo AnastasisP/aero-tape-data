@@ -5,7 +5,7 @@ import { loadChains } from "./registry-lib.mjs";
 
 export const TAPE_SCHEMA_VERSION = 1;
 export const TAPE_CLASSES = new Set(["E", "D", "P", "S"]);
-export const TAPE_METRICS = new Set(["gauge-state", "gauge-registry", "incentive-program", "fee-checkpoint", "allocation-change", "gauge-slope-change", "relay-registry", "token-registry", "token-leaf-state", "leaf-state", "root-state"]);
+export const TAPE_METRICS = new Set(["gauge-state", "gauge-registry", "incentive-program", "fee-checkpoint", "allocation-change", "gauge-slope-change", "relay-registry", "token-registry", "token-leaf-state", "leaf-state", "root-state", "pool-state"]);
 const SOURCE = /^chain(\+price:[a-z0-9][a-z0-9-]*)?$/;
 const ADDRESS = /^0x[0-9a-f]{40}$/;
 const UINT = /^[0-9]+$/;
@@ -28,6 +28,7 @@ const REQUIRED = {
   "token-leaf-state": { tokenId: "uintstr", kind: "kind", lastAllocated: "int", cooldownReduction: "int", stakeEnd: "int" },
   "leaf-state": { leafVoter: "address", zeroGaugeState: "object", index: "uint", emissionsPerVP: "uint", allocationCooldown: "posint" },
   "root-state": { votingEscrow: "object", voter: "object", chainStates: "array", minter: "object" },
+  "pool-state": { gauge: "address", pool: "address", poolType: "pooltype", tape: "address", token0: "address", token1: "address", balance0: "uint", balance1: "uint", cumulativeFee0: "uint", cumulativeFee1: "uint", cumulativeVolume0: "uint", cumulativeVolume1: "uint", swapCount: "int", lastSwapTimestamp: "int" },
 };
 
 function kindOk(kind, v) {
@@ -44,6 +45,8 @@ function kindOk(kind, v) {
       return typeof v === "string" && UINT.test(v) && v !== "0";
     case "kind":
       return v === "full" || v === "delta";
+    case "pooltype":
+      return v === "v2" || v === "cl";
     case "object":
       return v !== null && typeof v === "object" && !Array.isArray(v);
     case "array":

@@ -15,8 +15,11 @@ import { TapeStore } from "./store.mjs";
 import { rootStateAbi } from "./abis.mjs";
 import { allocationRows, readLeafAllocations, readLeafTokenStates, readRootTokenChains, tokenStateRows } from "./allocations.mjs";
 import { SCHEMA_VERSION } from "./snapshot.mjs";
+import { readPoolStates } from "./pools.mjs";
 
 const HOUR = 3600;
+/** Hours back every registry RPC serves state for (chains.json, checked at 47h). */
+const RING_HOURS = 48;
 
 function arg(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
@@ -95,12 +98,29 @@ async function tokenStateHour(store, chain, client, hour, block) {
   return { rows: tokenStateRows(prov, prev, next), next };
 }
 
+/**
+ * LP-side pool context (A28) of one chain-hour, for every gauge in the archived registry.
+ * A gauge first seen this hour joins from the next hour (the registry is saved with the hour).
+ */
+async function poolHour(store, chain, client, hour, block) {
+  const prov = { schemaVersion: SCHEMA_VERSION, chainId: chain.chainId, blockNumber: Number(block.number), blockTimestamp: Number(block.timestamp), bucket: hour, source: "chain", class: "E" };
+  const { rows } = await withRetry(() => readPoolStates(client, block.number, prov, store.gauges(chain.chainId)));
+  return { rows, next: null };
+}
+
 const ALLOC = "allocation-change";
 const TOKENS = "token-leaf-state";
-/** Metrics added after a chain's first hour: each backfills from activation with its own cursor. */
+const POOLS = "pool-state";
+/**
+ * Metrics added after a chain's first hour, each with its own cursor. A core metric
+ * backfills from activation; LP-side context (`since: "ring"`) from the start of the 48h
+ * ring at its first run, because older state is not served by every public RPC (drpc
+ * Robinhood: "Unknown state", 2026-10-26) and a failing backfill would freeze the chain.
+ */
 const LATE_METRICS = [
   { metric: ALLOC, state: "allocations", read: allocationHour, save: (next) => ({ legs: Object.fromEntries(next) }) },
   { metric: TOKENS, state: "token-states", read: tokenStateHour, save: (next) => ({ tokens: Object.fromEntries(next) }) },
+  { metric: POOLS, state: "pool-states", read: poolHour, save: () => ({}), since: "ring" },
 ];
 let failed = false;
 const runStatus = {}; // chainId -> { ok, error?, cursor, headTimestamp }
@@ -126,9 +146,10 @@ await Promise.all(
       // Backfill each late metric for hours the chain already has (its own cursor).
       for (const m of LATE_METRICS) {
         let mc = store.metricCursor(chain.chainId, m.metric);
-        if (cursor === null || (mc ?? first - HOUR) >= cursor) continue;
+        const start = m.since === "ring" ? Math.max(first, (cursor ?? first) - (RING_HOURS - 1) * HOUR) : first;
+        if (cursor === null || (mc ?? start - HOUR) >= cursor) continue;
         let blo = lo;
-        for (let h = (mc ?? first - HOUR) + HOUR; h <= cursor && written < maxHours; h += HOUR) {
+        for (let h = (mc ?? start - HOUR) + HOUR; h <= cursor && written < maxHours; h += HOUR) {
           const block = await withRetry(() => firstBlockAtOrAfter(client, h, blo, head));
           const { rows, next } = await m.read(store, chain, client, h, block);
           store.appendMetricHour(chain.chainId, m.metric, h, rows);
@@ -158,7 +179,7 @@ await Promise.all(
         written++;
       }
       const behind = Math.max(0, (lastComplete - (store.cursor(chain.chainId) ?? lastComplete)) / HOUR);
-      console.log(`${chain.slug}: +${written} hours, cursor ${store.cursor(chain.chainId)}, ${behind} hours behind, ${ALLOC} cursor ${store.metricCursor(chain.chainId, ALLOC)}, ${TOKENS} cursor ${store.metricCursor(chain.chainId, TOKENS)}`);
+      console.log(`${chain.slug}: +${written} hours, cursor ${store.cursor(chain.chainId)}, ${behind} hours behind, ${ALLOC} cursor ${store.metricCursor(chain.chainId, ALLOC)}, ${TOKENS} cursor ${store.metricCursor(chain.chainId, TOKENS)}, ${POOLS} cursor ${store.metricCursor(chain.chainId, POOLS)}`);
       runStatus[chain.chainId] = { ok: true, cursor: store.cursor(chain.chainId), headTimestamp: Number(head.timestamp) };
     } catch (err) {
       failed = true;
