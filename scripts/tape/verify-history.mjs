@@ -35,7 +35,7 @@ const root = chains.find((c) => c.role === "root");
 let owner = arg("owner");
 if (!owner) {
   // a token with allocations on Base, and its owner today
-  const raw = await fetch(`https://raw.githubusercontent.com/AnastasisP/aero-tape-data/data/derived/v1/8453/alloc/${Math.floor(rand() * 64)}.json`).then((r) => r.json());
+  const raw = await fetch(`https://raw.githubusercontent.com/AnastasisP/aero-tape-data/derived/derived/v1/8453/alloc/${Math.floor(rand() * 64)}.json`).then((r) => r.json());
   const ids = Object.entries(raw.tokens).filter(([, e]) => e.legs.length).map(([id]) => id);
   const id = ids[Math.floor(rand() * ids.length)];
   const ve = files[`root-${root.slug}.json`].addresses.votingEscrow;
