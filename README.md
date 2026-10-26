@@ -5,8 +5,11 @@ Mainnet, Ethereum, Arbitrum One, Ink, Robinhood Chain, Arc), read directly from 
 state. Descriptive data only: no forecast, no recommendation.
 
 - **`data` branch**: the tape. `v1/<chainId>/<metric>/<yyyy-mm>/<yyyy-mm-dd>.jsonl`, one
-  JSON object per line, `v1/manifest.json` with the sha256 of every file. `derived/v1/`
-  holds candles (1h / 4h / 1d / 1w) of the core series per gauge, rebuilt each run.
+  JSON object per line, `v1/manifest.json` with the sha256 of every file.
+- **`derived` branch**: `derived/v1/` — candles (1h / 4h / 1d / 1w) per gauge, LP-side and
+  emission series, decay calendars, position-history shards, the index. A deterministic
+  rebuild of `v1/` (`scripts/tape/build-derived.mjs`), so it is one commit replaced every
+  run and never grows the history.
 - **`main` branch**: the archiver (`scripts/tape/archive.mjs`), its verifiers and the
   hourly workflow (`.github/workflows/archive.yml`). Public RPCs only, no keys.
 
