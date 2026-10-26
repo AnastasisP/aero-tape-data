@@ -18,6 +18,7 @@ import { resolvePoint } from "../../lib/data/aero-v3/tape/points.mjs";
 import { fetchPrices, priceKey } from "./prices.mjs";
 import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.mjs";
 import { emissionBand } from "../../lib/data/aero-v3/tape/emissionBand.mjs";
+import { replayTokenTiers } from "./tiers.mjs";
 import { LP_SERIES_META, LP_SIDE, deriveLpHourly } from "../../lib/data/aero-v3/tape/lpSeries.mjs";
 import { EMISSION_SERIES_META, deriveEmissionHourly } from "../../lib/data/aero-v3/tape/emissionSeries.mjs";
 
@@ -142,7 +143,17 @@ for (const chain of chains) {
     leafVoter: loadDeployments().files[`leaf-${chain.slug}.json`].addresses.leafVoter.toLowerCase(),
     rpc: chain.rpcs[0],
     // display only: symbol and decimals of fee / incentive tokens (amounts stay in base units)
-    tokens: Object.fromEntries(rows.filter((r) => r.metric === "token-registry").map((r) => [r.token, { symbol: r.symbol, decimals: r.decimals }])),
+    // A35: the token's TokenRegistry tier at the newest hour it was read (absent before the metric)
+    tokens: (() => {
+      const tiers = replayTokenTiers(rowsOf(chain.chainId, ["token-tier"]));
+      const through = store.metricCursor(chain.chainId, "token-tier");
+      return Object.fromEntries(
+        rows.filter((r) => r.metric === "token-registry").map((r) => {
+          const t = tiers.get(r.token);
+          return [r.token, { symbol: r.symbol, decimals: r.decimals, ...(t ? { tier: { tierType: t.tierType, weight: t.weight, flags: t.flags, through } } : {}) }];
+        }),
+      );
+    })(),
     gauges,
     lp,
   };
@@ -153,7 +164,7 @@ const mobility = {};
 for (const chain of chains) {
   const through = Math.min(store.metricCursor(chain.chainId, "allocation-change") ?? -1, store.metricCursor(chain.chainId, "token-leaf-state") ?? -1);
   if (through < 0) continue;
-  mobility[chain.chainId] = chainMobility(rowsOf(chain.chainId, ["allocation-change", "token-leaf-state", "leaf-state"]), through);
+  mobility[chain.chainId] = chainMobility(rowsOf(chain.chainId, ["allocation-change", "token-leaf-state", "leaf-state"]), through, relayTokens);
 }
 const global = globalSeries(rowsOf(root.chainId, ["root-state"]), mobility);
 const byDay = new Map();
@@ -212,6 +223,8 @@ if (last) {
     migration: migrationOf(rowsOf(root.chainId, ["migration-state"]).at(-1)),
     // A32: mobile pressure = mobile / leaf-booked VP, ppm, same hour
     mobilePressurePpm: newestGlobal && newestGlobal.bucket === last.bucket && newestGlobal.mobilePressurePpm !== null ? newestGlobal.mobilePressurePpm.toString() : null,
+    // A38: share of leaf-booked VP held by relay veNFTs, same hour
+    relaySharePpm: newestGlobal && newestGlobal.bucket === last.bucket && newestGlobal.relaySharePpm !== null ? newestGlobal.relaySharePpm.toString() : null,
   };
 }
 // Last archiver run per chain (Frozen data state when it failed).

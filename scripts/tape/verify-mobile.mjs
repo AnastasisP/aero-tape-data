@@ -1,7 +1,8 @@
-// A26 verifier: pnpm tape:verify-mobile -- --dir <tape-data>
-// For each chain, at the newest hour both late metrics cover, the leaf-booked VP and the
-// mobile VP from the tape (global.mjs chainMobility) must equal a token-by-token rebuild
-// from fresh LeafVoter reads at that hour's block, to the wei.
+// A26 + A38 verifier: pnpm tape:verify-mobile -- --dir <tape-data>
+// For each chain, at the newest hour both late metrics cover, the leaf-booked VP, the
+// mobile VP and the relay-held VP (relay veNFTs from the archived relay registry) from the
+// tape (global.mjs chainMobility) must equal a token-by-token rebuild from fresh LeafVoter
+// reads at that hour's block, to the wei.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { loadChains, loadDeployments } from "./registry-lib.mjs";
@@ -25,6 +26,12 @@ const { files } = loadDeployments();
 const chains = loadChains();
 const root = chains.find((c) => c.role === "root");
 const failures = [];
+// relay veNFTs (A38): the archived relay registry of the root chain
+const relayTokens = new Set(
+  Object.keys(store.manifest.files)
+    .filter((f) => f.startsWith(`${root.chainId}/relay-registry/`) && existsSync(join(store.dir, f)))
+    .flatMap((f) => readFileSync(join(store.dir, f), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l).tokenId)),
+);
 const rowsOf = (chainId, metrics) =>
   Object.keys(store.manifest.files)
     .filter((f) => metrics.some((m) => f.startsWith(`${chainId}/${m}/`)) && existsSync(join(store.dir, f)))
@@ -32,13 +39,14 @@ const rowsOf = (chainId, metrics) =>
     .flatMap((f) => readFileSync(join(store.dir, f), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)));
 
 for (const chain of chains) {
-  const through = Math.min(store.metricCursor(chain.chainId, "allocation-change") ?? -1, store.metricCursor(chain.chainId, "token-leaf-state") ?? -1);
+  // the root chain must have the same hour too (the token set is read on the root at that hour)
+  const through = Math.min(store.metricCursor(chain.chainId, "allocation-change") ?? -1, store.metricCursor(chain.chainId, "token-leaf-state") ?? -1, store.cursor(root.chainId) ?? -1);
   if (through < 0) {
     failures.push(`${chain.slug}: late metrics not archived`);
     continue;
   }
   const rows = rowsOf(chain.chainId, ["allocation-change", "token-leaf-state", "leaf-state"]);
-  const tape = chainMobility(rows, through).get(through);
+  const tape = chainMobility(rows, through, relayTokens).get(through);
   const leafRow = rows.find((r) => r.metric === "leaf-state" && r.bucket === through);
   if (!tape || !leafRow) {
     failures.push(`${chain.slug}: no tape value at ${through}`);
@@ -61,16 +69,18 @@ for (const chain of chains) {
   }
   let booked = 0n;
   let mobile = 0n;
+  let relay = 0n;
   const t = leafRow.blockTimestamp;
   for (const [id, amount] of perToken) {
     const [lastAllocated, reduction, stakeEnd, perm] = states.get(id).split(",").map(Number);
     const k = contribution(amount, BigInt(stakeEnd), BigInt(t), perm === 1);
     booked += k.bias + k.perm;
     if (isMobile(t, lastAllocated, reduction, Number(leafRow.allocationCooldown))) mobile += k.bias + k.perm;
+    if (relayTokens.has(id)) relay += k.bias + k.perm;
   }
-  const ok = booked === tape.booked && mobile === tape.mobile;
-  if (!ok) failures.push(`${chain.slug} @${through}: tape booked ${tape.booked} mobile ${tape.mobile} != chain booked ${booked} mobile ${mobile}`);
-  console.log(`${chain.slug} @${new Date(through * 1000).toISOString()}: booked ${booked}, mobile ${mobile} ${ok ? "==" : "!="} tape`);
+  const ok = booked === tape.booked && mobile === tape.mobile && relay === tape.relay;
+  if (!ok) failures.push(`${chain.slug} @${through}: tape booked ${tape.booked} mobile ${tape.mobile} relay ${tape.relay} != chain booked ${booked} mobile ${mobile} relay ${relay}`);
+  console.log(`${chain.slug} @${new Date(through * 1000).toISOString()}: booked ${booked}, mobile ${mobile}, relay ${relay} ${ok ? "==" : "!="} tape`);
 }
 
 if (failures.length) {
@@ -78,4 +88,4 @@ if (failures.length) {
   for (const f of failures) console.error(`  - ${f}`);
   process.exit(1);
 }
-console.log("\nA26 PASS: booked and mobile VP rebuilt token by token == the tape, every chain");
+console.log("\nA26 + A38 PASS: booked, mobile and relay-held VP rebuilt token by token == the tape, every chain");

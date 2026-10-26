@@ -116,6 +116,14 @@ export const FIELD_SIDES = Object.freeze({
     stakedLiquidity: L,
     liquidity: L,
   },
+  // A35: governance classification of a token, context.
+  "token-tier": {
+    kind: C,
+    token: C,
+    tierType: C,
+    weight: C,
+    flags: C,
+  },
   // A33: v2 -> v3 migration progress, global context.
   "migration-state": {
     migration: C,

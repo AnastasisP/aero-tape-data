@@ -17,6 +17,7 @@ import { allocationRows, readLeafAllocations, readLeafTokenStates, readRootToken
 import { SCHEMA_VERSION } from "./snapshot.mjs";
 import { readClLiquidity, readPoolStates } from "./pools.mjs";
 import { readMigrationState } from "./migration.mjs";
+import { readTokenTiers, tokenTierRows } from "./tiers.mjs";
 
 const HOUR = 3600;
 /** Hours back every registry RPC serves state for (chains.json, checked at 47h). */
@@ -122,11 +123,22 @@ async function migrationHour(store, chain, client, hour, block) {
   return { rows: await withRetry(() => readMigrationState(client, files, chain, block.number, prov)), next: null };
 }
 
+/** Token tiers (A35) of every archived token on this chain, delta rows. */
+async function tokenTierHour(store, chain, client, hour, block) {
+  const prevState = store.readState(chain.chainId, "token-tiers");
+  const prev = prevState ? new Map(Object.entries(prevState.tiers)) : null;
+  const registry = files[`leaf-${chain.slug}.json`].addresses.tokenRegistry;
+  const next = await withRetry(() => readTokenTiers(client, registry, block.number, store.tokens(chain.chainId)));
+  const prov = { schemaVersion: SCHEMA_VERSION, chainId: chain.chainId, blockNumber: Number(block.number), blockTimestamp: Number(block.timestamp), bucket: hour, source: "chain", class: "E" };
+  return { rows: tokenTierRows(prov, prev, next), next };
+}
+
 const ALLOC = "allocation-change";
 const TOKENS = "token-leaf-state";
 const POOLS = "pool-state";
 const CL = "cl-liquidity";
 const MIGRATION = "migration-state";
+const TIERS = "token-tier";
 /**
  * Metrics added after a chain's first hour, each with its own cursor. A core metric
  * backfills from activation; LP-side context (`since: "ring"`) from the start of the 48h
@@ -141,6 +153,7 @@ const LATE_METRICS = [
   { metric: POOLS, state: "pool-states", read: poolHour, save: () => ({}), since: "ring" },
   { metric: CL, state: "cl-liquidity", read: clLiquidityHour, save: () => ({}), since: "now" },
   { metric: MIGRATION, state: "migration-state", read: migrationHour, save: () => ({}), rootOnly: true },
+  { metric: TIERS, state: "token-tiers", read: tokenTierHour, save: (next) => ({ tiers: Object.fromEntries(next) }), since: "now" },
 ];
 let failed = false;
 const runStatus = {}; // chainId -> { ok, error?, cursor, headTimestamp }
