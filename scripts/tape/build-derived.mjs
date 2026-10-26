@@ -19,6 +19,7 @@ import { fetchPrices, priceKey } from "./prices.mjs";
 import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.mjs";
 import { emissionBand } from "../../lib/data/aero-v3/tape/emissionBand.mjs";
 import { replayTokenTiers } from "./tiers.mjs";
+import { ALLOC_SHARDS, shardOf, tokenEvents } from "../../lib/data/aero-v3/tape/history.mjs";
 import { LP_SERIES_META, LP_SIDE, deriveLpHourly } from "../../lib/data/aero-v3/tape/lpSeries.mjs";
 import { EMISSION_SERIES_META, deriveEmissionHourly } from "../../lib/data/aero-v3/tape/emissionSeries.mjs";
 
@@ -160,6 +161,30 @@ for (const chain of chains) {
   };
 }
 
+// Position history shards (A40): per token, its allocation legs and leaf state as change
+// events, sharded by tokenId % ALLOC_SHARDS. A shard is rewritten only when one of its
+// tokens changes; the hours (block, time) go to per-day files and `allocThrough` to the
+// index, so an hour without activity touches one hours file per chain.
+const allocThrough = {};
+for (const chain of chains) {
+  const through = Math.min(store.metricCursor(chain.chainId, "allocation-change") ?? -1, store.metricCursor(chain.chainId, "token-leaf-state") ?? -1);
+  if (through < 0) continue;
+  allocThrough[chain.chainId] = through;
+  const rows = rowsOf(chain.chainId, ["allocation-change", "token-leaf-state", "leaf-state"]).filter((r) => r.bucket <= through);
+  const byDay = new Map();
+  for (const r of rows.filter((x) => x.metric === "leaf-state").sort((a, b) => a.bucket - b.bucket)) {
+    const day = new Date(r.bucket * 1000).toISOString().slice(0, 10);
+    if (!byDay.has(day)) byDay.set(day, []);
+    byDay.get(day).push([r.bucket, r.blockNumber, r.blockTimestamp]);
+  }
+  for (const [day, hours] of byDay) if (writeJson(`${chain.chainId}/alloc/hours/${day}.json`, { schemaVersion: 1, chainId: chain.chainId, day, hours })) written++;
+  const shards = Array.from({ length: ALLOC_SHARDS }, () => ({}));
+  for (const [id, ev] of tokenEvents(rows)) shards[shardOf(id)][id] = ev;
+  shards.forEach((tokens, n) => {
+    if (writeJson(`${chain.chainId}/alloc/${n}.json`, { schemaVersion: 1, chainId: chain.chainId, source: "chain", class: "D", tokens })) written++;
+  });
+}
+
 // Global hourly series (A26): total, allocated, idle, mobile VP, per chain booked / mobile.
 const mobility = {};
 for (const chain of chains) {
@@ -228,6 +253,8 @@ if (last) {
     relaySharePpm: newestGlobal && newestGlobal.bucket === last.bucket && newestGlobal.relaySharePpm !== null ? newestGlobal.relaySharePpm.toString() : null,
   };
 }
+// A40: the newest hour the position-history shards cover, per chain
+index.allocThrough = allocThrough;
 // Last archiver run per chain (Frozen data state when it failed).
 const run = store.readState("all", "run");
 index.status = run?.chains ?? {};
