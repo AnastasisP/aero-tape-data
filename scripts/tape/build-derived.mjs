@@ -147,10 +147,11 @@ for (const chain of chains) {
     tokens: (() => {
       const tiers = replayTokenTiers(rowsOf(chain.chainId, ["token-tier"]));
       const through = store.metricCursor(chain.chainId, "token-tier");
+      const block = through === null ? null : (rowsOf(chain.chainId, ["leaf-state"]).find((r) => r.bucket === through)?.blockNumber ?? null);
       return Object.fromEntries(
         rows.filter((r) => r.metric === "token-registry").map((r) => {
           const t = tiers.get(r.token);
-          return [r.token, { symbol: r.symbol, decimals: r.decimals, ...(t ? { tier: { tierType: t.tierType, weight: t.weight, flags: t.flags, through } } : {}) }];
+          return [r.token, { symbol: r.symbol, decimals: r.decimals, ...(t ? { tier: { tierType: t.tierType, weight: t.weight, flags: t.flags, through, block } } : {}) }];
         }),
       );
     })(),
