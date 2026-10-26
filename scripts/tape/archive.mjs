@@ -228,6 +228,16 @@ await Promise.all(
 // The last run's outcome per chain, for the data state (Frozen when a chain's run failed).
 const prevRun = store.readState("all", "run") ?? { chains: {} };
 store.writeState("all", "run", { chains: { ...prevRun.chains, ...runStatus } });
+// A42: one line per run for the archive-health view: when, which CI run, and per chain
+// whether it succeeded, its cursor and how many complete hours it still lagged the head.
+const ranAt = Math.floor(Date.now() / 1000);
+store.appendStateLog("all", "runs", new Date(ranAt * 1000).toISOString().slice(0, 10), {
+  at: ranAt,
+  runId: process.env.GITHUB_RUN_ID ?? null,
+  chains: Object.fromEntries(
+    Object.entries(runStatus).map(([id, r]) => [id, { ok: r.ok, cursor: r.cursor, lag: r.headTimestamp && r.cursor !== null ? Math.max(0, (Math.floor(r.headTimestamp / HOUR) * HOUR - r.cursor) / HOUR) : null }]),
+  ),
+});
 const failedChains = Object.entries(runStatus).filter(([, r]) => !r.ok).map(([id]) => id);
 if (failedChains.length) console.log(`frozen this run (RPC failure, recorded): ${failedChains.join(", ")}`);
 process.exit(failed && failedChains.length === chains.length ? 1 : 0);

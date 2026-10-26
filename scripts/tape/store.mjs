@@ -3,7 +3,7 @@
 // Day files, not month files: a month of Base gauge-state is ~150 MB, over GitHub's 100 MB file cap.
 // Integrity rule: a file's bytes up to manifest.bytes must hash to manifest.sha256.
 // Bytes past that point are an interrupted append and are cut back on open.
-import { existsSync, mkdirSync, readFileSync, renameSync, truncateSync, appendFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, truncateSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { assertRecord } from "./schema.mjs";
@@ -85,6 +85,16 @@ export class TapeStore {
   readState(chainId, name) {
     const abs = join(this.root, "state", String(chainId), `${name}.json`);
     return existsSync(abs) ? JSON.parse(readFileSync(abs, "utf8")) : null;
+  }
+
+  /**
+   * Appends one JSON line to <root>/state/<chainId>/<name>/<yyyy-mm-dd>.jsonl (A42 run log;
+   * working state like the rest of state/, kept in the data branch, not in the manifest).
+   */
+  appendStateLog(chainId, name, day, value) {
+    const abs = join(this.root, "state", String(chainId), name, `${day}.jsonl`);
+    mkdirSync(dirname(abs), { recursive: true });
+    appendFileSync(abs, JSON.stringify(value) + "\n");
   }
 
   writeState(chainId, name, value) {

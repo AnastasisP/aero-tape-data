@@ -9,7 +9,7 @@
 //   <chainId>/lp/<tf>/<period>.json LP-side pool context (A28), same periods, never staker revenue
 //   <chainId>/emissions/<tf>/<period>.json gauge emission accounting (A29), LP-side, same periods
 //   index.json                      gauges (tokens, pool, hours) and the market state
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { loadChains, loadDeployments } from "./registry-lib.mjs";
 import { TapeStore } from "./store.mjs";
@@ -20,6 +20,7 @@ import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.
 import { emissionBand } from "../../lib/data/aero-v3/tape/emissionBand.mjs";
 import { replayTokenTiers } from "./tiers.mjs";
 import { ALLOC_SHARDS, shardOf, tokenEvents } from "../../lib/data/aero-v3/tape/history.mjs";
+import { archiveHealth } from "../../lib/data/aero-v3/tape/health.mjs";
 import { LP_SERIES_META, LP_SIDE, deriveLpHourly } from "../../lib/data/aero-v3/tape/lpSeries.mjs";
 import { EMISSION_SERIES_META, deriveEmissionHourly } from "../../lib/data/aero-v3/tape/emissionSeries.mjs";
 
@@ -270,6 +271,14 @@ if (last) {
 }
 // A40: the newest hour the position-history shards cover, per chain
 index.allocThrough = allocThrough;
+// A42: archive health over the last 7 days of runs (state/all/runs/<day>.jsonl)
+{
+  const logDir = join(dir, "state", "all", "runs");
+  const lines = existsSync(logDir)
+    ? readdirSync(logDir).filter((f) => f.endsWith(".jsonl")).sort().slice(-8).flatMap((f) => readFileSync(join(logDir, f), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)))
+    : [];
+  index.health = archiveHealth(lines);
+}
 // Last archiver run per chain (Frozen data state when it failed).
 const run = store.readState("all", "run");
 index.status = run?.chains ?? {};

@@ -88,6 +88,9 @@ jobs:
       - name: Gauge emissions (derived candles == fresh gaugeStates, 20 random)
         run: node scripts/tape/verify-emissions.mjs --dir tape-data --sample 20
 
+      - name: Archive health (index == a recount of the run log)
+        run: node scripts/tape/verify-health.mjs --dir tape-data
+
       - name: Freshness (every chain within 3h of its head)
         run: node scripts/tape/verify-archive.mjs --dir tape-data
 
