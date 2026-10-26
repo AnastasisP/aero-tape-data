@@ -278,6 +278,11 @@ index.allocThrough = allocThrough;
     ? readdirSync(logDir).filter((f) => f.endsWith(".jsonl")).sort().slice(-8).flatMap((f) => readFileSync(join(logDir, f), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)))
     : [];
   index.health = archiveHealth(lines);
+  // A52: the verifiers' verdicts of the last 24 finished runs (state/all/verifications)
+  const vDir = join(dir, "state", "all", "verifications");
+  index.verifications = existsSync(vDir)
+    ? readdirSync(vDir).filter((f) => f.endsWith(".jsonl")).sort().slice(-3).flatMap((f) => readFileSync(join(vDir, f), "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l))).sort((a, b) => a.at - b.at).slice(-24)
+    : [];
 }
 // Last archiver run per chain (Frozen data state when it failed).
 const run = store.readState("all", "run");

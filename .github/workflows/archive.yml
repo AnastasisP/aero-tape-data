@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 concurrency:
   group: archive
@@ -52,6 +53,13 @@ jobs:
           cache: npm
 
       - run: npm ci --no-audit --no-fund
+
+      # A52: the verifiers' verdicts of finished runs into the tape's working state (one run behind)
+      - name: Verification log
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/tape/log-verifications.mjs --out tape-data
 
       - name: Archive
         id: archive
