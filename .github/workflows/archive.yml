@@ -85,6 +85,9 @@ jobs:
       - name: Protocol parity (fee revenue from the tape == earnedFees, 25 veNFTs)
         run: node scripts/tape/verify-parity.mjs --dir tape-data --tokens 25
 
+      - name: Gauge emissions (derived candles == fresh gaugeStates, 20 random)
+        run: node scripts/tape/verify-emissions.mjs --dir tape-data --sample 20
+
       - name: Freshness (every chain within 3h of its head)
         run: node scripts/tape/verify-archive.mjs --dir tape-data
 
