@@ -7,7 +7,9 @@ name: archive
 
 on:
   schedule:
-    - cron: "17 * * * *"
+    # twice an hour: GitHub starts scheduled runs late or skips them; a run with no new
+    # complete hour exits quickly, and the concurrency group never overlaps two runs
+    - cron: "17,47 * * * *"
   workflow_dispatch: {}
 
 permissions:
