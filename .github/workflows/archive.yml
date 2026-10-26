@@ -16,14 +16,14 @@ permissions:
   contents: write
   actions: read
 
-concurrency:
-  group: archive
-  cancel-in-progress: false
-
 jobs:
   archive:
     runs-on: ubuntu-latest
     timeout-minutes: 55
+    # on the job, not the workflow: the pacer below must not hold the group while it waits
+    concurrency:
+      group: archive
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
@@ -124,3 +124,32 @@ jobs:
       - name: Fail if the archive step failed
         if: steps.archive.outcome == 'failure'
         run: exit 1
+
+  # GitHub starts scheduled runs late or not at all on this repo (one every 2-5 h observed),
+  # so each run dispatches the next one for :17 of the next hour. A dispatch made with
+  # GITHUB_TOKEN is allowed to start a run. Only the newest run's pacer dispatches, so
+  # schedule, manual and paced runs never multiply.
+  next:
+    needs: archive
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    permissions:
+      actions: write
+    steps:
+      - name: Wait for :17 of the next hour
+        run: |
+          now=$(date -u +%s)
+          next=$(( (now / 3600 + 1) * 3600 + 17 * 60 ))
+          echo "sleeping $(( next - now )) s until $(date -u -d @$next +%H:%M)Z"
+          sleep $(( next - now ))
+      - name: Dispatch the next archive run (unless a newer run already started)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mine=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .created_at)
+          newer=$(gh run list -R "$GITHUB_REPOSITORY" --workflow archive.yml -L 20 --json createdAt,databaseId \
+            --jq "[.[] | select(.createdAt > \"$mine\" and .databaseId != $GITHUB_RUN_ID)] | length")
+          if [ "$newer" -gt 0 ]; then echo "a newer run exists ($newer): not dispatching"; exit 0; fi
+          gh workflow run archive.yml -R "$GITHUB_REPOSITORY" --ref main
+          echo "dispatched the next run"
