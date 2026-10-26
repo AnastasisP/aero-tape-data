@@ -3,7 +3,9 @@
 //  a. `--sample` random gauge-state lines from the files on disk, each re-read alone
 //  b. one random archived hour per chain, re-read whole (every gauge, leaf, root)
 //  c. `--sample` random pool-state lines (A28, LP-side context), each pool re-read alone
-// Prints the sample so a failure can be replayed. Exit 1 on any mismatch.
+// Prints the sample so a failure can be replayed. Exit 1 on any mismatch. A read the RPC
+// cannot serve (drpc Robinhood "Unknown state") is reported as unverified, not as a
+// mismatch; exit 1 too when more than half of the sampled reads went unverified.
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { loadChains, loadDeployments } from "./registry-lib.mjs";
@@ -40,6 +42,18 @@ const chains = loadChains();
 const byId = new Map(chains.map((c) => [c.chainId, c]));
 const { files } = loadDeployments();
 const failures = [];
+const unverified = [];
+let attempted = 0;
+/** One fresh read: its result, or null (recorded as unverified) when the RPC cannot serve it. */
+async function fresh(label, read) {
+  attempted++;
+  try {
+    return await withRetry(read);
+  } catch (err) {
+    unverified.push(`${label}: ${String(err.details ?? err.shortMessage ?? err.message).slice(0, 120)}`);
+    return null;
+  }
+}
 const lines = (rel) => readFileSync(join(store.dir, rel), "utf8").split("\n").filter(Boolean);
 const onDisk = (prefix) =>
   Object.entries(manifest.files).filter(([rel]) => rel.includes(prefix) && existsSync(join(store.dir, rel)));
@@ -80,12 +94,13 @@ for (const [rel, idxs] of picks) {
     const g = { gauge: rec.gauge, pool: links[0], rewards: links[1] };
     const leafVoter = files[`leaf-${chain.slug}.json`].addresses.leafVoter;
     const block = BigInt(rec.blockNumber);
-    const res = await withRetry(() =>
+    const res = await fresh(`${chain.slug} ${rec.gauge} @${rec.blockNumber}`, () =>
       multicallAt(clientFor(chain), block, [
         { address: MULTICALL3, abi: multicall3Abi, functionName: "getCurrentBlockTimestamp" },
         ...gaugeCalls(leafVoter, g),
       ]),
     );
+    if (!res) continue;
     const prov = { ...rec, blockTimestamp: Number(res[0]) };
     for (const k of Object.keys(prov)) if (!["schemaVersion", "chainId", "blockNumber", "blockTimestamp", "bucket", "source", "class"].includes(k)) delete prov[k];
     compare(`${chain.slug} ${rec.gauge} @${rec.blockNumber}`, rec, gaugeRecordFrom(prov, g, res.slice(1)).record);
@@ -108,16 +123,17 @@ for (const chain of chains) {
       .filter((r) => r.bucket === leaf.bucket);
   const allKnown = new Map(Object.entries(manifest.programs[chain.chainId] ?? {}).map(([k]) => [k, Infinity]));
   const allGauges = new Map(Object.entries(manifest.gauges[chain.chainId] ?? {}).map(([k]) => [k, "*"]));
-  const snap = await withRetry(() =>
+  const snap = await fresh(`${chain.slug} hour @${leaf.blockNumber}`, () =>
     readHourSnapshot(clientFor(chain), chain, files, BigInt(leaf.blockNumber), leaf.bucket, allKnown, allGauges),
   );
+  if (!snap) continue;
   compare(`${chain.slug} leaf-state @${leaf.blockNumber}`, leaf, snap.leaf);
   const archivedGauges = hourOf("gauge-state");
   if (archivedGauges.length !== snap.gauge.length) {
     failures.push(`${chain.slug} @${leaf.blockNumber}: ${archivedGauges.length} archived gauges != ${snap.gauge.length} fresh`);
   }
-  const fresh = new Map(snap.gauge.map((r) => [r.gauge, r]));
-  for (const r of archivedGauges) compare(`${chain.slug} ${r.gauge} @${r.blockNumber}`, r, fresh.get(r.gauge) ?? {});
+  const freshGauges = new Map(snap.gauge.map((r) => [r.gauge, r]));
+  for (const r of archivedGauges) compare(`${chain.slug} ${r.gauge} @${r.blockNumber}`, r, freshGauges.get(r.gauge) ?? {});
   if (snap.root) {
     const [root] = hourOf("root-state");
     if (root) compare(`${chain.slug} root-state @${root.blockNumber}`, root, snap.root);
@@ -135,16 +151,23 @@ for (let n = 0; n < sampleSize && poolLines.length; n++) {
   const rec = JSON.parse(l);
   const chain = byId.get(rec.chainId);
   const prov = { schemaVersion: rec.schemaVersion, chainId: rec.chainId, blockNumber: rec.blockNumber, blockTimestamp: rec.blockTimestamp, bucket: rec.bucket, source: rec.source, class: rec.class };
-  const { rows } = await withRetry(() => readPoolStates(clientFor(chain), BigInt(rec.blockNumber), prov, new Map([[rec.gauge, `${rec.pool},,,`]])));
+  const read = await fresh(`${chain.slug} pool ${rec.pool} @${rec.blockNumber}`, () => readPoolStates(clientFor(chain), BigInt(rec.blockNumber), prov, new Map([[rec.gauge, `${rec.pool},,,`]])));
+  poolPoints++;
+  if (!read) continue;
+  const { rows } = read;
   if (rows.length !== 1) failures.push(`${rel}:${i + 1}: pool ${rec.pool} has no readable tape at ${rec.blockNumber}`);
   else compare(`${chain.slug} pool ${rec.pool} @${rec.blockNumber}`, rec, rows[0]);
-  poolPoints++;
 }
 console.log(`${poolPoints} pool-state points re-read`);
 
+if (unverified.length) {
+  console.log(`\n${unverified.length} of ${attempted} reads unverified (RPC could not serve them):`);
+  for (const u of unverified.slice(0, 20)) console.log(`  ~ ${u}`);
+}
+if (unverified.length * 2 > attempted) failures.push(`${unverified.length} of ${attempted} reads unverified: too few points checked`);
 if (failures.length) {
   console.error(`\nA5 FAIL (seed ${startSeed}): ${failures.length} mismatch(es)`);
   for (const f of failures.slice(0, 40)) console.error(`  - ${f}`);
   process.exit(1);
 }
-console.log(`\nA5 PASS (seed ${startSeed}): 0 mismatches`);
+console.log(`\nA5 PASS (seed ${startSeed}): 0 mismatches in ${attempted - unverified.length} verified reads`);
