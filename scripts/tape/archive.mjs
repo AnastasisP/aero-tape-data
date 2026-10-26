@@ -15,7 +15,8 @@ import { TapeStore } from "./store.mjs";
 import { rootStateAbi } from "./abis.mjs";
 import { allocationRows, readLeafAllocations, readLeafTokenStates, readRootTokenChains, tokenStateRows } from "./allocations.mjs";
 import { SCHEMA_VERSION } from "./snapshot.mjs";
-import { readPoolStates } from "./pools.mjs";
+import { readClLiquidity, readPoolStates } from "./pools.mjs";
+import { readMigrationState } from "./migration.mjs";
 
 const HOUR = 3600;
 /** Hours back every registry RPC serves state for (chains.json, checked at 47h). */
@@ -108,19 +109,38 @@ async function poolHour(store, chain, client, hour, block) {
   return { rows, next: null };
 }
 
+/** CL pool in-range and staked liquidity (A31) of one chain-hour; context, LP-side. */
+async function clLiquidityHour(store, chain, client, hour, block) {
+  const prov = { schemaVersion: SCHEMA_VERSION, chainId: chain.chainId, blockNumber: Number(block.number), blockTimestamp: Number(block.timestamp), bucket: hour, source: "chain", class: "E" };
+  const { rows } = await withRetry(() => readClLiquidity(client, block.number, prov, store.gauges(chain.chainId)));
+  return { rows, next: null };
+}
+
+/** v2 -> v3 migration progress (A33), root chain only (leaf chains: no rows). */
+async function migrationHour(store, chain, client, hour, block) {
+  const prov = { schemaVersion: SCHEMA_VERSION, chainId: chain.chainId, blockNumber: Number(block.number), blockTimestamp: Number(block.timestamp), bucket: hour, source: "chain", class: "E" };
+  return { rows: await withRetry(() => readMigrationState(client, files, chain, block.number, prov)), next: null };
+}
+
 const ALLOC = "allocation-change";
 const TOKENS = "token-leaf-state";
 const POOLS = "pool-state";
+const CL = "cl-liquidity";
+const MIGRATION = "migration-state";
 /**
  * Metrics added after a chain's first hour, each with its own cursor. A core metric
  * backfills from activation; LP-side context (`since: "ring"`) from the start of the 48h
  * ring at its first run, because older state is not served by every public RPC (drpc
- * Robinhood: "Unknown state", 2026-10-26) and a failing backfill would freeze the chain.
+ * Robinhood: "Unknown state", 2026-10-26) and a failing backfill would freeze the chain;
+ * `since: "now"` starts at the next hour with no backfill (drpc Robinhood also failed
+ * 36h-old reads for every retry of the A31 backfill).
  */
 const LATE_METRICS = [
   { metric: ALLOC, state: "allocations", read: allocationHour, save: (next) => ({ legs: Object.fromEntries(next) }) },
   { metric: TOKENS, state: "token-states", read: tokenStateHour, save: (next) => ({ tokens: Object.fromEntries(next) }) },
   { metric: POOLS, state: "pool-states", read: poolHour, save: () => ({}), since: "ring" },
+  { metric: CL, state: "cl-liquidity", read: clLiquidityHour, save: () => ({}), since: "now" },
+  { metric: MIGRATION, state: "migration-state", read: migrationHour, save: () => ({}), rootOnly: true },
 ];
 let failed = false;
 const runStatus = {}; // chainId -> { ok, error?, cursor, headTimestamp }
@@ -129,6 +149,8 @@ const runStatus = {}; // chainId -> { ok, error?, cursor, headTimestamp }
 await Promise.all(
   chains.map(async (chain) => {
     const client = clientFor(chain);
+    // a root-only metric (migration) is never processed on a leaf chain: no reads, no cursor
+    const lateMetrics = LATE_METRICS.filter((m) => !m.rootOnly || chain.role === "root");
     let written = 0;
     try {
       const head = await safeHead(client);
@@ -144,8 +166,9 @@ await Promise.all(
       const tokenKeys = store.tokens(chain.chainId);
       const first = Math.ceil(activation / HOUR) * HOUR;
       // Backfill each late metric for hours the chain already has (its own cursor).
-      for (const m of LATE_METRICS) {
+      for (const m of lateMetrics) {
         let mc = store.metricCursor(chain.chainId, m.metric);
+        if (m.since === "now") continue; // joins with the next archived hour
         const start = m.since === "ring" ? Math.max(first, (cursor ?? first) - (RING_HOURS - 1) * HOUR) : first;
         if (cursor === null || (mc ?? start - HOUR) >= cursor) continue;
         let blo = lo;
@@ -164,9 +187,9 @@ await Promise.all(
         const block = await withRetry(() => firstBlockAtOrAfter(client, hour, lo, head));
         const snap = await withRetry(() => readHourSnapshot(client, chain, files, block.number, hour, programs, gauges, feeCps, slopeKeys, relayKeys, tokenKeys));
         const late = [];
-        for (const m of LATE_METRICS) late.push({ m, ...(await m.read(store, chain, client, hour, block)) });
+        for (const m of lateMetrics) late.push({ m, ...(await m.read(store, chain, client, hour, block)) });
         const records = [snap.leaf, ...snap.registry, ...snap.gauge, ...snap.programs, ...snap.feeCheckpoints, ...snap.slopeChanges, ...snap.relays, ...snap.tokens, ...late.flatMap((x) => x.rows), ...(snap.root ? [snap.root] : [])];
-        store.appendHour(chain.chainId, hour, records, snap.programs, snap.registry, snap.feeCheckpoints, LATE_METRICS.map((m) => m.metric));
+        store.appendHour(chain.chainId, hour, records, snap.programs, snap.registry, snap.feeCheckpoints, lateMetrics.map((m) => m.metric));
         for (const x of late) store.writeState(chain.chainId, x.m.state, { bucket: hour, ...x.m.save(x.next) });
         for (const p of snap.programs) programs.set(p.rewards, Math.max(programs.get(p.rewards) ?? 0, p.programId));
         for (const g of snap.registry) gauges.set(g.gauge, [g.pool, g.rewards, g.token0, g.token1].join(","));
@@ -179,7 +202,7 @@ await Promise.all(
         written++;
       }
       const behind = Math.max(0, (lastComplete - (store.cursor(chain.chainId) ?? lastComplete)) / HOUR);
-      console.log(`${chain.slug}: +${written} hours, cursor ${store.cursor(chain.chainId)}, ${behind} hours behind, ${ALLOC} cursor ${store.metricCursor(chain.chainId, ALLOC)}, ${TOKENS} cursor ${store.metricCursor(chain.chainId, TOKENS)}, ${POOLS} cursor ${store.metricCursor(chain.chainId, POOLS)}`);
+      console.log(`${chain.slug}: +${written} hours, cursor ${store.cursor(chain.chainId)}, ${behind} hours behind, ${ALLOC} cursor ${store.metricCursor(chain.chainId, ALLOC)}, ${TOKENS} cursor ${store.metricCursor(chain.chainId, TOKENS)}, ${POOLS} cursor ${store.metricCursor(chain.chainId, POOLS)}, ${CL} cursor ${store.metricCursor(chain.chainId, CL)}`);
       runStatus[chain.chainId] = { ok: true, cursor: store.cursor(chain.chainId), headTimestamp: Number(head.timestamp) };
     } catch (err) {
       failed = true;

@@ -96,7 +96,7 @@ export class TapeStore {
 
   /**
    * Last hour processed for a metric added after the chain's first hour (its rows may be
-   * empty for an hour). null = never processed: the archiver backfills it from activation (core metrics) or from the start of the 48h ring (LP-side context, archive.mjs LATE_METRICS).
+   * empty for an hour). null = never processed: the archiver backfills it from activation (core metrics) or from the start of the 48h ring, or from the next hour (LP-side context, archive.mjs LATE_METRICS).
    */
   metricCursor(chainId, metric) {
     return this.manifest.metricCursors[chainId]?.[metric] ?? null;

@@ -3,6 +3,8 @@
 //  a. `--sample` random gauge-state lines from the files on disk, each re-read alone
 //  b. one random archived hour per chain, re-read whole (every gauge, leaf, root)
 //  c. `--sample` random pool-state lines (A28, LP-side context), each pool re-read alone
+//  d. `--sample` random cl-liquidity lines (A31), each pool re-read alone
+//  e. up to 10 random migration-state lines (A33), re-read at their blocks
 // Prints the sample so a failure can be replayed. Exit 1 on any mismatch. A read the RPC
 // cannot serve (drpc Robinhood "Unknown state") is reported as unverified, not as a
 // mismatch; exit 1 too when more than half of the sampled reads went unverified.
@@ -12,7 +14,8 @@ import { loadChains, loadDeployments } from "./registry-lib.mjs";
 import { MULTICALL3, clientFor, multicallAt, withRetry } from "./client.mjs";
 import { multicall3Abi } from "./abis.mjs";
 import { gaugeCalls, gaugeRecordFrom, readHourSnapshot } from "./snapshot.mjs";
-import { readPoolStates } from "./pools.mjs";
+import { readClLiquidity, readPoolStates } from "./pools.mjs";
+import { readMigrationState } from "./migration.mjs";
 import { TapeStore } from "./store.mjs";
 
 function arg(name, fallback) {
@@ -159,6 +162,38 @@ for (let n = 0; n < sampleSize && poolLines.length; n++) {
   else compare(`${chain.slug} pool ${rec.pool} @${rec.blockNumber}`, rec, rows[0]);
 }
 console.log(`${poolPoints} pool-state points re-read`);
+
+// d. random cl-liquidity points (A31): same reader, one gauge, at the recorded block
+const clLines = onDisk("/cl-liquidity/").flatMap(([rel]) => lines(rel).map((l, i) => ({ rel, i, l })));
+let clPoints = 0;
+for (let n = 0; n < sampleSize && clLines.length; n++) {
+  const { rel, i, l } = clLines[Math.floor(rand() * clLines.length)];
+  const rec = JSON.parse(l);
+  const chain = byId.get(rec.chainId);
+  const prov = { schemaVersion: rec.schemaVersion, chainId: rec.chainId, blockNumber: rec.blockNumber, blockTimestamp: rec.blockTimestamp, bucket: rec.bucket, source: rec.source, class: rec.class };
+  const read = await fresh(`${chain.slug} cl ${rec.pool} @${rec.blockNumber}`, () => readClLiquidity(clientFor(chain), BigInt(rec.blockNumber), prov, new Map([[rec.gauge, `${rec.pool},,,`]])));
+  clPoints++;
+  if (!read) continue;
+  if (read.rows.length !== 1) failures.push(`${rel}:${i + 1}: CL pool ${rec.pool} has no liquidity read at ${rec.blockNumber}`);
+  else compare(`${chain.slug} cl ${rec.pool} @${rec.blockNumber}`, rec, read.rows[0]);
+}
+console.log(`${clPoints} cl-liquidity points re-read`);
+
+// e. random migration-state points (A33): same reader, at the recorded block
+const migLines = onDisk("/migration-state/").flatMap(([rel]) => lines(rel).map((l, i) => ({ rel, i, l })));
+let migPoints = 0;
+for (let n = 0; n < Math.min(10, sampleSize) && migLines.length; n++) {
+  const { rel, i, l } = migLines[Math.floor(rand() * migLines.length)];
+  const rec = JSON.parse(l);
+  const chain = byId.get(rec.chainId);
+  const prov = { schemaVersion: rec.schemaVersion, chainId: rec.chainId, blockNumber: rec.blockNumber, blockTimestamp: rec.blockTimestamp, bucket: rec.bucket, source: rec.source, class: rec.class };
+  const rows = await fresh(`${chain.slug} migration @${rec.blockNumber}`, () => readMigrationState(clientFor(chain), files, chain, BigInt(rec.blockNumber), prov));
+  migPoints++;
+  if (!rows) continue;
+  if (rows.length !== 1) failures.push(`${rel}:${i + 1}: no migration state at ${rec.blockNumber}`);
+  else compare(`${chain.slug} migration @${rec.blockNumber}`, rec, rows[0]);
+}
+console.log(`${migPoints} migration-state points re-read`);
 
 if (unverified.length) {
   console.log(`\n${unverified.length} of ${attempted} reads unverified (RPC could not serve them):`);

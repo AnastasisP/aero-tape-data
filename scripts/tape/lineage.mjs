@@ -107,6 +107,24 @@ export const FIELD_SIDES = Object.freeze({
     lastSwapTimestamp: C,
     swapCount: L,
   },
+  // A31: a CL pool's in-range liquidity and its staked part. Staked LPs forgo swap fees for
+  // emissions; stakers are paid only through FeeDistribution (goal §13: stakedLiquidity is
+  // LP-side context).
+  "cl-liquidity": {
+    gauge: C,
+    pool: C,
+    stakedLiquidity: L,
+    liquidity: L,
+  },
+  // A33: v2 -> v3 migration progress, global context.
+  "migration-state": {
+    migration: C,
+    v2Escrow: C,
+    migrationTokenId: C,
+    paidBasis: C,
+    migratedLocked: C,
+    v2Supply: C,
+  },
   "leaf-state": {
     leafVoter: C,
     ...gaugeStateSides("zeroGaugeState"),
@@ -180,6 +198,12 @@ export const LP_SIDE_NAMES = Object.freeze([
   "poolSwapFees",
   "poolVolume",
   "poolSwaps",
+  "emissionsCredited",
+  "emissionsClaimed",
+  "emissionsForfeited",
+  "emissionsClaimable",
+  "stakedLiquidity",
+  "stakedShare",
 ]);
 
 const PROVENANCE = new Set(["schemaVersion", "chainId", "blockNumber", "blockTimestamp", "bucket", "source", "class", "metric"]);

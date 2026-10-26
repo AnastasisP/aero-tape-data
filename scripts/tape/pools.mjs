@@ -8,7 +8,7 @@
 // so the pool type decides the ABI. A target with no factory, no tape, or a failing read
 // at this block (not yet deployed, not a pool) gets no record: the same rule on re-read,
 // so verify-exact reproduces the skip set.
-import { clPoolTapeAbi, poolMetaAbi, poolTapeAbi } from "./abis.mjs";
+import { clLiquidityAbi, clPoolTapeAbi, poolMetaAbi, poolTapeAbi } from "./abis.mjs";
 import { softMulticallAt as softMulticall } from "./client.mjs";
 import { ser } from "./snapshot.mjs";
 
@@ -52,11 +52,12 @@ export function poolRecordFrom(prov, p, acc, balance0, balance1) {
 }
 
 /**
- * pool-state records of one chain-hour.
- * @param gauges Map gauge -> "pool,rewards,token0,token1" (the archived gauge registry)
- * @returns {Promise<{ rows: Array<Record<string, any>>, skipped: number }>} skipped = gauges whose target has no readable pool tape here
+ * Pool targets of the gauges at one block: each gauge's pool, its tokens and its tape
+ * (factory clPoolTape() -> CL, else poolTape() -> V2). A pool without readable factory /
+ * tokens / tape is left out.
+ * @returns {Promise<{ entries: Array<{ gauge: string, pool: string }>, targets: Array<{ pool, factory, token0, token1, poolType, tape }> }>}
  */
-export async function readPoolStates(client, block, prov, gauges) {
+async function resolveTargets(client, block, gauges) {
   const entries = [...gauges.entries()].map(([gauge, links]) => ({ gauge, pool: links.split(",")[0] })).sort((a, b) => (a.gauge < b.gauge ? -1 : 1));
   const pools = [...new Set(entries.map((e) => e.pool))];
   const meta = await softMulticall(
@@ -82,6 +83,16 @@ export async function readPoolStates(client, block, prov, gauges) {
     else if (v2.ok && lc(v2.value) !== ZERO) tapeOf.set(f, { poolType: "v2", tape: lc(v2.value) });
   });
   const targets = pools.filter((p) => info.has(p) && tapeOf.has(info.get(p).factory)).map((pool) => ({ pool, ...info.get(pool), ...tapeOf.get(info.get(pool).factory) }));
+  return { entries, targets };
+}
+
+/**
+ * pool-state records of one chain-hour.
+ * @param gauges Map gauge -> "pool,rewards,token0,token1" (the archived gauge registry)
+ * @returns {Promise<{ rows: Array<Record<string, any>>, skipped: number }>} skipped = gauges whose target has no readable pool tape here
+ */
+export async function readPoolStates(client, block, prov, gauges) {
+  const { entries, targets } = await resolveTargets(client, block, gauges);
   const reads = await softMulticall(
     client,
     block,
@@ -107,4 +118,34 @@ export async function readPoolStates(client, block, prov, gauges) {
     rows.push(poolRecordFrom(prov, { gauge: e.gauge, pool: e.pool, poolType: s.t.poolType, tape: s.t.tape, token0: s.t.token0, token1: s.t.token1 }, s.acc, s.b0, s.b1));
   }
   return { rows, skipped };
+}
+
+/**
+ * cl-liquidity records of one chain-hour (A31): for every gauge whose pool is a CL pool
+ * (resolveTargets), the pool's in-range liquidity() and stakedLiquidity(). Context only,
+ * LP-side: the staked share says how much of the active liquidity is staked in the gauge
+ * (staked LPs forgo swap fees for emissions), never staker revenue. A pool whose reads
+ * fail at this block gets no record (same rule on re-read).
+ * @returns {Promise<{ rows: Array<Record<string, any>> }>}
+ */
+export async function readClLiquidity(client, block, prov, gauges) {
+  const { entries, targets } = await resolveTargets(client, block, gauges);
+  const cl = targets.filter((t) => t.poolType === "cl");
+  const reads = await softMulticall(
+    client,
+    block,
+    cl.flatMap((t) => [
+      { address: t.pool, abi: clLiquidityAbi, functionName: "stakedLiquidity" },
+      { address: t.pool, abi: clLiquidityAbi, functionName: "liquidity" },
+    ]),
+  );
+  const state = new Map();
+  cl.forEach((t, i) => {
+    const [st, li] = reads.slice(2 * i, 2 * i + 2);
+    if (st.ok && li.ok) state.set(t.pool, { stakedLiquidity: st.value, liquidity: li.value });
+  });
+  const rows = entries
+    .filter((e) => state.has(e.pool))
+    .map((e) => ser({ ...prov, metric: "cl-liquidity", gauge: e.gauge, pool: e.pool, stakedLiquidity: state.get(e.pool).stakedLiquidity, liquidity: state.get(e.pool).liquidity }));
+  return { rows };
 }

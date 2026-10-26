@@ -17,6 +17,7 @@ import { SERIES_META, TIMEFRAMES, aggregate, deriveHourly, serialize } from "../
 import { resolvePoint } from "../../lib/data/aero-v3/tape/points.mjs";
 import { fetchPrices, priceKey } from "./prices.mjs";
 import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.mjs";
+import { emissionBand } from "../../lib/data/aero-v3/tape/emissionBand.mjs";
 import { LP_SERIES_META, LP_SIDE, deriveLpHourly } from "../../lib/data/aero-v3/tape/lpSeries.mjs";
 import { EMISSION_SERIES_META, deriveEmissionHourly } from "../../lib/data/aero-v3/tape/emissionSeries.mjs";
 
@@ -99,8 +100,8 @@ for (const chain of chains) {
   // A28: LP-side context, its own files so no staker-revenue view reads it by accident.
   const lp = {};
   const lpFiles = new Map();
-  const lpRows = rowsOf(chain.chainId, ["pool-state"]);
-  const lpPool = new Map(lpRows.map((r) => [r.gauge, r]));
+  const lpRows = rowsOf(chain.chainId, ["pool-state", "cl-liquidity"]);
+  const lpPool = new Map(lpRows.filter((r) => r.metric === "pool-state").map((r) => [r.gauge, r]));
   for (const [gauge, points] of deriveLpHourly(lpRows)) {
     const r = lpPool.get(gauge);
     lp[gauge] = { pool: r.pool, poolType: r.poolType, tape: r.tape, firstHour: points[0].bucket, lastHour: points.at(-1).bucket };
@@ -166,6 +167,14 @@ for (const [day, points] of byDay) {
 }
 const newestGlobal = global.at(-1);
 
+/** Newest migration-state row -> migrated, still locked in v2 outside the pile, migrated share (ppm). */
+function migrationOf(r) {
+  if (!r) return null;
+  const migrated = BigInt(r.migratedLocked);
+  const supply = BigInt(r.v2Supply);
+  return { bucket: r.bucket, blockNumber: r.blockNumber, paidBasis: r.paidBasis, migratedLocked: r.migratedLocked, v2Supply: r.v2Supply, remainingLocked: (supply - migrated).toString(), migratedSharePpm: supply > 0n ? ((migrated * 1_000_000n) / supply).toString() : null };
+}
+
 // Market state at the newest root hour (goal §5c, §6): total, allocated, idle VP, chain budgets.
 const rootRows = rowsOf(root.chainId, ["root-state"]);
 const last = rootRows.at(-1);
@@ -198,6 +207,11 @@ if (last) {
     relays: relayRows.map((r) => ({ relay: r.relay, tokenId: r.tokenId, name: r.name, relayType: r.relayType })),
     // A26: allocated VP that can move now (cooldown elapsed), at the same hour when available
     mobile: newestGlobal && newestGlobal.bucket === last.bucket && newestGlobal.mobile !== null ? newestGlobal.mobile.toString() : null,
+    // A33: the Minter's emission band (effective rate recomputed == emissionRate) and v2 migration progress
+    emissionBand: serialize(emissionBand(last.minter)),
+    migration: migrationOf(rowsOf(root.chainId, ["migration-state"]).at(-1)),
+    // A32: mobile pressure = mobile / leaf-booked VP, ppm, same hour
+    mobilePressurePpm: newestGlobal && newestGlobal.bucket === last.bucket && newestGlobal.mobilePressurePpm !== null ? newestGlobal.mobilePressurePpm.toString() : null,
   };
 }
 // Last archiver run per chain (Frozen data state when it failed).

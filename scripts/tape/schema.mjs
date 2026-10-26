@@ -5,7 +5,7 @@ import { loadChains } from "./registry-lib.mjs";
 
 export const TAPE_SCHEMA_VERSION = 1;
 export const TAPE_CLASSES = new Set(["E", "D", "P", "S"]);
-export const TAPE_METRICS = new Set(["gauge-state", "gauge-registry", "incentive-program", "fee-checkpoint", "allocation-change", "gauge-slope-change", "relay-registry", "token-registry", "token-leaf-state", "leaf-state", "root-state", "pool-state"]);
+export const TAPE_METRICS = new Set(["gauge-state", "gauge-registry", "incentive-program", "fee-checkpoint", "allocation-change", "gauge-slope-change", "relay-registry", "token-registry", "token-leaf-state", "leaf-state", "root-state", "pool-state", "cl-liquidity", "migration-state"]);
 const SOURCE = /^chain(\+price:[a-z0-9][a-z0-9-]*)?$/;
 const ADDRESS = /^0x[0-9a-f]{40}$/;
 const UINT = /^[0-9]+$/;
@@ -29,6 +29,8 @@ const REQUIRED = {
   "leaf-state": { leafVoter: "address", zeroGaugeState: "object", index: "uint", emissionsPerVP: "uint", allocationCooldown: "posint" },
   "root-state": { votingEscrow: "object", voter: "object", chainStates: "array", minter: "object" },
   "pool-state": { gauge: "address", pool: "address", poolType: "pooltype", tape: "address", token0: "address", token1: "address", balance0: "uint", balance1: "uint", cumulativeFee0: "uint", cumulativeFee1: "uint", cumulativeVolume0: "uint", cumulativeVolume1: "uint", swapCount: "int", lastSwapTimestamp: "int" },
+  "cl-liquidity": { gauge: "address", pool: "address", stakedLiquidity: "uint", liquidity: "uint" },
+  "migration-state": { migration: "address", v2Escrow: "address", migrationTokenId: "uint", paidBasis: "uint", migratedLocked: "uint", v2Supply: "uint" },
 };
 
 function kindOk(kind, v) {

@@ -129,6 +129,9 @@ export const poolTapeAbi = parseAbi([
   "function accumulators(address) view returns (uint128 cumulativeFee0, uint128 cumulativeFee1, uint128 cumulativeVolume0, uint128 cumulativeVolume1, uint128 cumulativeMevVolume0, uint128 cumulativeMevVolume1, uint128 cumulativeMevFee0, uint128 cumulativeMevFee1, uint48 lastSwapTimestamp, uint48 swapCount)",
 ]);
 
+/** CL (Slipstream) pool liquidity: in-range liquidity and the staked part of it (A31). */
+export const clLiquidityAbi = parseAbi(["function stakedLiquidity() view returns (uint128)", "function liquidity() view returns (uint128)"]);
+
 export const clPoolTapeAbi = parseAbi([
   "struct Accumulator { uint40 lastSwapTimestamp; uint40 lastObservationTimestamp; uint32 swapCount; int24 lastTick; int24 intervalMaxTick; int24 intervalMinTick; int24 intervalOpenTick; uint48 volatilityCorrob; uint120 cumulativeVolume0; uint120 cumulativeVolume1; uint16 intervalSwapCount; uint120 cumulativeFee0; uint120 cumulativeFee1; uint8 volatilityRingHead; uint8 volatilityRingCount; uint120 cumulativeMevVolume0; uint120 cumulativeMevVolume1; uint8 nOver; uint120 cumulativeMevFee0; uint120 cumulativeMevFee1; }",
   "function accumulators(address) view returns (Accumulator)",
