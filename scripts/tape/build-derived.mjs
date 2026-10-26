@@ -75,6 +75,8 @@ for (const chain of chains) {
       token1: reg?.token1 ?? null,
       firstHour: points[0].bucket,
       lastHour: last.bucket,
+      // A41: incentive programs on the gauge, each as first archived (block of the row)
+      programs: programsOf(rows, gauge),
       // the newest hour, for market-wide views (water level, A20): class D, token-native
       latest: serialize({ bucket: last.bucket, blockNumber: last.blockNumber, weight: last.weight, voteSupply: last.voteSupply, yieldPerWeight: last.yieldPerWeight, weightFlow: last.weightFlow, allocators: last.allocators, allocatedAmount: last.allocatedAmount, relayAllocatedAmount: last.relayAllocatedAmount }),
     };
@@ -203,6 +205,19 @@ for (const [day, points] of byDay) {
   if (writeJson(`global/1h/${day}.json`, { schemaVersion: 1, tf: "1h", period: day, source: "chain", class: "D", points: serialize(points) })) written++;
 }
 const newestGlobal = global.at(-1);
+
+/** Incentive programs of a gauge from its incentive-program rows: the first row of each program (A41). */
+function programsOf(rows, gauge) {
+  const seen = new Map();
+  for (const r of rows) {
+    if (r.metric !== "incentive-program" || r.gauge !== gauge) continue;
+    const k = `${r.rewards}:${r.programId}`;
+    if (!seen.has(k) || r.bucket < seen.get(k).bucket) seen.set(k, r);
+  }
+  return [...seen.values()]
+    .sort((a, b) => a.programId - b.programId)
+    .map((r) => ({ programId: r.programId, token: r.token, amount: r.amount, start: Number(r.start), end: Number(r.end), bucket: r.bucket, blockNumber: r.blockNumber }));
+}
 
 /** Newest migration-state row -> migrated, still locked in v2 outside the pile, migrated share (ppm). */
 function migrationOf(r) {
