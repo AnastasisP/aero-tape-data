@@ -22,6 +22,8 @@ import { readTokenTiers, tokenTierRows } from "./tiers.mjs";
 const HOUR = 3600;
 /** Hours back every registry RPC serves state for (chains.json, checked at 47h). */
 const RING_HOURS = 48;
+/** Pause before the one retry pass of chains whose run failed (A56). */
+const RETRY_PAUSE_S = Number(process.env.TAPE_RETRY_PAUSE_S ?? 60);
 
 function arg(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
@@ -159,72 +161,80 @@ let failed = false;
 const runStatus = {}; // chainId -> { ok, error?, cursor, headTimestamp }
 // Chains run in parallel (separate RPCs); hours within a chain run in order. The
 // store is synchronous, so appends from different chains never interleave mid-write.
-await Promise.all(
-  chains.map(async (chain) => {
-    const client = clientFor(chain);
-    // a root-only metric (migration) is never processed on a leaf chain: no reads, no cursor
-    const lateMetrics = LATE_METRICS.filter((m) => !m.rootOnly || chain.role === "root");
-    let written = 0;
-    try {
-      const head = await safeHead(client);
-      const lastComplete = Math.floor(Number(head.timestamp) / HOUR) * HOUR;
-      const cursor = store.cursor(chain.chainId);
-      let hour = cursor === null ? Math.ceil(activation / HOUR) * HOUR : cursor + HOUR;
-      let lo = await client.getBlock({ blockNumber: 0n });
-      const programs = store.programs(chain.chainId);
-      const gauges = store.gauges(chain.chainId);
-      const feeCps = store.feeCheckpoints(chain.chainId);
-      const slopeKeys = store.slopeChanges(chain.chainId);
-      const relayKeys = store.relays(chain.chainId);
-      const tokenKeys = store.tokens(chain.chainId);
-      const first = Math.ceil(activation / HOUR) * HOUR;
-      // Backfill each late metric for hours the chain already has (its own cursor).
-      for (const m of lateMetrics) {
-        let mc = store.metricCursor(chain.chainId, m.metric);
-        if (m.since === "now") continue; // joins with the next archived hour
-        const start = m.since === "ring" ? Math.max(first, (cursor ?? first) - (RING_HOURS - 1) * HOUR) : first;
-        if (cursor === null || (mc ?? start - HOUR) >= cursor) continue;
-        let blo = lo;
-        for (let h = (mc ?? start - HOUR) + HOUR; h <= cursor && written < maxHours; h += HOUR) {
-          const block = await withRetry(() => firstBlockAtOrAfter(client, h, blo, head));
-          const { rows, next } = await m.read(store, chain, client, h, block);
-          store.appendMetricHour(chain.chainId, m.metric, h, rows);
-          store.writeState(chain.chainId, m.state, { bucket: h, ...m.save(next) });
-          mc = h;
-          blo = block;
-          written++;
-        }
-        if (mc < cursor) hour = lastComplete + HOUR; // budget spent: new hours wait for the next run
-      }
-      for (; hour <= lastComplete && written < maxHours; hour += HOUR) {
-        const block = await withRetry(() => firstBlockAtOrAfter(client, hour, lo, head));
-        const snap = await withRetry(() => readHourSnapshot(client, chain, files, block.number, hour, programs, gauges, feeCps, slopeKeys, relayKeys, tokenKeys));
-        const late = [];
-        for (const m of lateMetrics) late.push({ m, ...(await m.read(store, chain, client, hour, block)) });
-        const records = [snap.leaf, ...snap.registry, ...snap.gauge, ...snap.programs, ...snap.feeCheckpoints, ...snap.slopeChanges, ...snap.relays, ...snap.tokens, ...late.flatMap((x) => x.rows), ...(snap.root ? [snap.root] : [])];
-        store.appendHour(chain.chainId, hour, records, snap.programs, snap.registry, snap.feeCheckpoints, lateMetrics.map((m) => m.metric));
-        for (const x of late) store.writeState(chain.chainId, x.m.state, { bucket: hour, ...x.m.save(x.next) });
-        for (const p of snap.programs) programs.set(p.rewards, Math.max(programs.get(p.rewards) ?? 0, p.programId));
-        for (const g of snap.registry) gauges.set(g.gauge, [g.pool, g.rewards, g.token0, g.token1].join(","));
-        for (const c of snap.feeCheckpoints) feeCps.set(c.rewards, Math.max(feeCps.get(c.rewards) ?? 0, c.index));
-        for (const r of snap.slopeChanges) slopeKeys.add(`${r.gauge}:${r.boundary}`);
-        for (const r of snap.relays) relayKeys.add(r.relay);
-        for (const r of snap.tokens) tokenKeys.add(r.token);
-        // block.timestamp < hour + 1h, or block is also the first block >= the next hour.
-        lo = block;
+const archiveChain = async (chain) => {
+  const client = clientFor(chain);
+  // a root-only metric (migration) is never processed on a leaf chain: no reads, no cursor
+  const lateMetrics = LATE_METRICS.filter((m) => !m.rootOnly || chain.role === "root");
+  let written = 0;
+  try {
+    const head = await safeHead(client);
+    const lastComplete = Math.floor(Number(head.timestamp) / HOUR) * HOUR;
+    const cursor = store.cursor(chain.chainId);
+    let hour = cursor === null ? Math.ceil(activation / HOUR) * HOUR : cursor + HOUR;
+    let lo = await client.getBlock({ blockNumber: 0n });
+    const programs = store.programs(chain.chainId);
+    const gauges = store.gauges(chain.chainId);
+    const feeCps = store.feeCheckpoints(chain.chainId);
+    const slopeKeys = store.slopeChanges(chain.chainId);
+    const relayKeys = store.relays(chain.chainId);
+    const tokenKeys = store.tokens(chain.chainId);
+    const first = Math.ceil(activation / HOUR) * HOUR;
+    // Backfill each late metric for hours the chain already has (its own cursor).
+    for (const m of lateMetrics) {
+      let mc = store.metricCursor(chain.chainId, m.metric);
+      if (m.since === "now") continue; // joins with the next archived hour
+      const start = m.since === "ring" ? Math.max(first, (cursor ?? first) - (RING_HOURS - 1) * HOUR) : first;
+      if (cursor === null || (mc ?? start - HOUR) >= cursor) continue;
+      let blo = lo;
+      for (let h = (mc ?? start - HOUR) + HOUR; h <= cursor && written < maxHours; h += HOUR) {
+        const block = await withRetry(() => firstBlockAtOrAfter(client, h, blo, head));
+        const { rows, next } = await m.read(store, chain, client, h, block);
+        store.appendMetricHour(chain.chainId, m.metric, h, rows);
+        store.writeState(chain.chainId, m.state, { bucket: h, ...m.save(next) });
+        mc = h;
+        blo = block;
         written++;
       }
-      const behind = Math.max(0, (lastComplete - (store.cursor(chain.chainId) ?? lastComplete)) / HOUR);
-      console.log(`${chain.slug}: +${written} hours, cursor ${store.cursor(chain.chainId)}, ${behind} hours behind, ${ALLOC} cursor ${store.metricCursor(chain.chainId, ALLOC)}, ${TOKENS} cursor ${store.metricCursor(chain.chainId, TOKENS)}, ${POOLS} cursor ${store.metricCursor(chain.chainId, POOLS)}, ${CL} cursor ${store.metricCursor(chain.chainId, CL)}`);
-      runStatus[chain.chainId] = { ok: true, cursor: store.cursor(chain.chainId), headTimestamp: Number(head.timestamp) };
-    } catch (err) {
-      failed = true;
-      runStatus[chain.chainId] = { ok: false, error: String(err.shortMessage ?? err.message).slice(0, 200), cursor: store.cursor(chain.chainId) };
-      console.error(`${chain.slug}: FAILED after ${written} hours: ${err.shortMessage ?? err.message} ${err.details ?? ""}`.trim());
-      if (process.env.TAPE_DEBUG) console.error(err);
+      if (mc < cursor) hour = lastComplete + HOUR; // budget spent: new hours wait for the next run
     }
-  }),
-);
+    for (; hour <= lastComplete && written < maxHours; hour += HOUR) {
+      const block = await withRetry(() => firstBlockAtOrAfter(client, hour, lo, head));
+      const snap = await withRetry(() => readHourSnapshot(client, chain, files, block.number, hour, programs, gauges, feeCps, slopeKeys, relayKeys, tokenKeys));
+      const late = [];
+      for (const m of lateMetrics) late.push({ m, ...(await m.read(store, chain, client, hour, block)) });
+      const records = [snap.leaf, ...snap.registry, ...snap.gauge, ...snap.programs, ...snap.feeCheckpoints, ...snap.slopeChanges, ...snap.relays, ...snap.tokens, ...late.flatMap((x) => x.rows), ...(snap.root ? [snap.root] : [])];
+      store.appendHour(chain.chainId, hour, records, snap.programs, snap.registry, snap.feeCheckpoints, lateMetrics.map((m) => m.metric));
+      for (const x of late) store.writeState(chain.chainId, x.m.state, { bucket: hour, ...x.m.save(x.next) });
+      for (const p of snap.programs) programs.set(p.rewards, Math.max(programs.get(p.rewards) ?? 0, p.programId));
+      for (const g of snap.registry) gauges.set(g.gauge, [g.pool, g.rewards, g.token0, g.token1].join(","));
+      for (const c of snap.feeCheckpoints) feeCps.set(c.rewards, Math.max(feeCps.get(c.rewards) ?? 0, c.index));
+      for (const r of snap.slopeChanges) slopeKeys.add(`${r.gauge}:${r.boundary}`);
+      for (const r of snap.relays) relayKeys.add(r.relay);
+      for (const r of snap.tokens) tokenKeys.add(r.token);
+      // block.timestamp < hour + 1h, or block is also the first block >= the next hour.
+      lo = block;
+      written++;
+    }
+    const behind = Math.max(0, (lastComplete - (store.cursor(chain.chainId) ?? lastComplete)) / HOUR);
+    console.log(`${chain.slug}: +${written} hours, cursor ${store.cursor(chain.chainId)}, ${behind} hours behind, ${ALLOC} cursor ${store.metricCursor(chain.chainId, ALLOC)}, ${TOKENS} cursor ${store.metricCursor(chain.chainId, TOKENS)}, ${POOLS} cursor ${store.metricCursor(chain.chainId, POOLS)}, ${CL} cursor ${store.metricCursor(chain.chainId, CL)}`);
+    runStatus[chain.chainId] = { ok: true, cursor: store.cursor(chain.chainId), headTimestamp: Number(head.timestamp) };
+  } catch (err) {
+    runStatus[chain.chainId] = { ok: false, error: String(err.shortMessage ?? err.message).slice(0, 200), cursor: store.cursor(chain.chainId) };
+    console.error(`${chain.slug}: FAILED after ${written} hours: ${err.shortMessage ?? err.message} ${err.details ?? ""}`.trim());
+    if (process.env.TAPE_DEBUG) console.error(err);
+  }
+};
+await Promise.all(chains.map(archiveChain));
+// A56: a load-balanced public RPC sometimes routes a whole run's past-block reads to nodes without
+// that state (drpc Robinhood, 3 of 26 runs on 2026-10-26/27, each leaving the chain's newest sample
+// 2-3 h old). One more pass for the chains that failed, after a pause; hours already written stay.
+const retry = chains.filter((c) => runStatus[c.chainId]?.ok === false);
+if (retry.length) {
+  console.log(`retrying ${retry.map((c) => c.slug).join(", ")} once in ${RETRY_PAUSE_S} s`);
+  await new Promise((r) => setTimeout(r, RETRY_PAUSE_S * 1000));
+  await Promise.all(retry.map(archiveChain));
+}
+failed = chains.some((c) => runStatus[c.chainId]?.ok === false);
 // The last run's outcome per chain, for the data state (Frozen when a chain's run failed).
 const prevRun = store.readState("all", "run") ?? { chains: {} };
 store.writeState("all", "run", { chains: { ...prevRun.chains, ...runStatus } });

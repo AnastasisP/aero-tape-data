@@ -143,13 +143,19 @@ jobs:
           next=$(( (now / 3600 + 1) * 3600 + 17 * 60 ))
           echo "sleeping $(( next - now )) s until $(date -u -d @$next +%H:%M)Z"
           sleep $(( next - now ))
-      - name: Dispatch the next archive run (unless a newer run already started)
+      - name: Dispatch the next archive run (unless a newer run covers this hour)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # A newer run covers this hour only if it started at :12 or later (before that, Ethereum and
+          # the OP chains' safe head has not reached the new hour, so it archives nothing new), or if
+          # its own pacer targets this same :17. A late schedule run at :05 used to silence this
+          # dispatch and leave the hour to the next one: samples up to 140 min old (A56, 2026-10-27).
+          target=$(( $(date -u +%s) / 3600 * 3600 + 17 * 60 ))
           mine=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --jq .created_at)
           newer=$(gh run list -R "$GITHUB_REPOSITORY" --workflow archive.yml -L 20 --json createdAt,databaseId \
-            --jq "[.[] | select(.createdAt > \"$mine\" and .databaseId != $GITHUB_RUN_ID)] | length")
-          if [ "$newer" -gt 0 ]; then echo "a newer run exists ($newer): not dispatching"; exit 0; fi
+            --jq "[.[] | select(.createdAt > \"$mine\" and .databaseId != $GITHUB_RUN_ID) | (.createdAt | fromdateiso8601) as \$c
+                  | select(\$c >= $target - 300 or ((((\$c + 600) / 3600) | floor) + 1) * 3600 + 1020 == $target)] | length")
+          if [ "$newer" -gt 0 ]; then echo "a newer run covers $(date -u -d @$target +%H:%M)Z ($newer): not dispatching"; exit 0; fi
           gh workflow run archive.yml -R "$GITHUB_REPOSITORY" --ref main
           echo "dispatched the next run"
