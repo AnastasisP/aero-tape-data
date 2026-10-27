@@ -49,12 +49,21 @@ const picks = [];
 for (let i = 0; i < sample && pool.length; i++) picks.push(pool[Math.floor(rand() * pool.length)]);
 // the previous hour's block: the candle before in the same file, else read the state at closeBlock of the prior file
 let checked = 0;
+// a sample the RPC cannot read after the retries is unreadable, not a mismatch (run 40510677245 crashed on one
+// "RPC Request failed"); the run still fails when more than half the samples are unreadable
+const unreadable = [];
 for (const { chain, gauge, c, prev } of picks) {
   if (!prev || prev.bucket !== c.bucket - 3600) continue; // first candle of a day file: skip (flow crosses files)
   const leafVoter = files[`leaf-${chain.slug}.json`].addresses.leafVoter;
   const client = clientFor(chain);
   const read = (block) => withRetry(() => multicallAt(client, BigInt(block), [{ address: leafVoter, abi: leafStateAbi, functionName: "gaugeStates", args: [gauge] }]));
-  const [[now], [before]] = await Promise.all([read(c.closeBlock), read(prev.closeBlock)]);
+  let now, before;
+  try {
+    [[now], [before]] = await Promise.all([read(c.closeBlock), read(prev.closeBlock)]);
+  } catch (err) {
+    unreadable.push(`${chain.slug} ${gauge} @${c.closeBlock}: ${err.shortMessage ?? err.message}`);
+    continue;
+  }
   const v = (k) => BigInt(c.series[k].v);
   const want = {
     emissionsClaimable: now[0] - now[1] - now[5],
@@ -65,8 +74,10 @@ for (const { chain, gauge, c, prev } of picks) {
   for (const [k, w] of Object.entries(want)) if (v(k) !== w) failures.push(`${chain.slug} ${gauge} @${c.closeBlock}: ${k} served ${v(k)} != chain ${w}`);
   checked++;
 }
-console.log(`seed ${startSeed}: ${checked} candles re-read at their blocks (${pool.length} in the pool)`);
+console.log(`seed ${startSeed}: ${checked} candles re-read at their blocks (${pool.length} in the pool), ${unreadable.length} unreadable`);
+for (const u of unreadable) console.log(`  unreadable: ${u}`);
 if (!checked) failures.push("no candle checked");
+if (unreadable.length * 2 > checked + unreadable.length) failures.push(`${unreadable.length} of ${checked + unreadable.length} samples unreadable (RPC)`);
 if (failures.length) {
   console.error(`\nA29 FAIL: ${failures.length} problem(s)`);
   for (const f of failures.slice(0, 30)) console.error(`  - ${f}`);
