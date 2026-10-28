@@ -64,9 +64,44 @@ const onDisk = (prefix) =>
 function compare(label, archived, fresh) {
   const a = JSON.stringify(archived);
   const f = JSON.stringify(fresh);
-  if (a === f) return;
+  if (a === f) return true;
   const diff = Object.keys(archived).find((k) => JSON.stringify(archived[k]) !== JSON.stringify(fresh[k]));
   failures.push(`${label}: field "${diff}" archived ${JSON.stringify(archived[diff])} != fresh ${JSON.stringify(fresh[diff])}`);
+  return false;
+}
+
+/** One gauge-state record re-read alone at its block (pinned multicall), or null when the RPC cannot serve it. */
+async function readGaugeRecord(rec) {
+  const chain = byId.get(rec.chainId);
+  const links = manifest.gauges[rec.chainId]?.[rec.gauge]?.split(",");
+  if (!links) return null;
+  const g = { gauge: rec.gauge, pool: links[0], rewards: links[1] };
+  const leafVoter = files[`leaf-${chain.slug}.json`].addresses.leafVoter;
+  const res = await withRetry(() =>
+    multicallAt(clientFor(chain), BigInt(rec.blockNumber), [{ address: MULTICALL3, abi: multicall3Abi, functionName: "getCurrentBlockTimestamp" }, ...gaugeCalls(leafVoter, g)]),
+  ).catch(() => null);
+  if (!res) return null;
+  const prov = { ...rec, blockTimestamp: Number(res[0]) };
+  for (const k of Object.keys(prov)) if (!["schemaVersion", "chainId", "blockNumber", "blockTimestamp", "bucket", "source", "class"].includes(k)) delete prov[k];
+  return gaugeRecordFrom(prov, g, res.slice(1)).record;
+}
+
+/**
+ * A mismatch is confirmed before it counts (archive run 40614095805, 2026-10-28): a public RPC answered a
+ * pinned read of block 53142127 with later state (block.number matched, the incentive count was the one
+ * created 19 h later, which the archive's own program rows date). Two more reads of the same point: a
+ * mismatch stands only when all fresh reads agree with each other and differ from the archive; otherwise the
+ * RPC was inconsistent and the point is unverified (still bounded by the more-than-half rule).
+ */
+async function confirmGauge(label, archived, firstFresh) {
+  if (JSON.stringify(archived) === JSON.stringify(firstFresh)) return;
+  const again = [await readGaugeRecord(archived), await readGaugeRecord(archived)];
+  const freshes = [firstFresh, ...again].map((r) => JSON.stringify(r));
+  if (again.some((r) => r === null) || new Set(freshes).size > 1 || freshes.includes(JSON.stringify(archived))) {
+    unverified.push(`${label}: RPC inconsistent across 3 reads of the same block`);
+    return;
+  }
+  compare(label, archived, firstFresh);
 }
 
 // a. random gauge-state points
@@ -106,7 +141,7 @@ for (const [rel, idxs] of picks) {
     if (!res) continue;
     const prov = { ...rec, blockTimestamp: Number(res[0]) };
     for (const k of Object.keys(prov)) if (!["schemaVersion", "chainId", "blockNumber", "blockTimestamp", "bucket", "source", "class"].includes(k)) delete prov[k];
-    compare(`${chain.slug} ${rec.gauge} @${rec.blockNumber}`, rec, gaugeRecordFrom(prov, g, res.slice(1)).record);
+    await confirmGauge(`${chain.slug} ${rec.gauge} @${rec.blockNumber}`, rec, gaugeRecordFrom(prov, g, res.slice(1)).record);
     points++;
   }
 }
@@ -136,7 +171,7 @@ for (const chain of chains) {
     failures.push(`${chain.slug} @${leaf.blockNumber}: ${archivedGauges.length} archived gauges != ${snap.gauge.length} fresh`);
   }
   const freshGauges = new Map(snap.gauge.map((r) => [r.gauge, r]));
-  for (const r of archivedGauges) compare(`${chain.slug} ${r.gauge} @${r.blockNumber}`, r, freshGauges.get(r.gauge) ?? {});
+  for (const r of archivedGauges) await confirmGauge(`${chain.slug} ${r.gauge} @${r.blockNumber}`, r, freshGauges.get(r.gauge) ?? {});
   if (snap.root) {
     const [root] = hourOf("root-state");
     if (root) compare(`${chain.slug} root-state @${root.blockNumber}`, root, snap.root);
