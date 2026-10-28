@@ -168,7 +168,10 @@ const archiveChain = async (chain) => {
   let written = 0;
   try {
     const head = await safeHead(client);
-    const lastComplete = Math.floor(Number(head.timestamp) / HOUR) * HOUR;
+    // A56: an hour is archived only once the root chain's head (read once per run) has reached it too: each
+    // hour reads the root's token -> chain map, and a leaf whose head passed the hour first failed with
+    // "hi block <root block> is before <hour>" (arc, run 40582972595 at 21:00Z, 2026-10-27)
+    const lastComplete = Math.min(Math.floor(Number(head.timestamp) / HOUR) * HOUR, Math.floor(Number(rootHead.timestamp) / HOUR) * HOUR);
     const cursor = store.cursor(chain.chainId);
     let hour = cursor === null ? Math.ceil(activation / HOUR) * HOUR : cursor + HOUR;
     let lo = await client.getBlock({ blockNumber: 0n });
@@ -227,11 +230,13 @@ const archiveChain = async (chain) => {
 await Promise.all(chains.map(archiveChain));
 // A56: a load-balanced public RPC sometimes routes a whole run's past-block reads to nodes without
 // that state (drpc Robinhood, 3 of 26 runs on 2026-10-26/27, each leaving the chain's newest sample
-// 2-3 h old). One more pass for the chains that failed, after a pause; hours already written stay.
-const retry = chains.filter((c) => runStatus[c.chainId]?.ok === false);
-if (retry.length) {
-  console.log(`retrying ${retry.map((c) => c.slug).join(", ")} once in ${RETRY_PAUSE_S} s`);
-  await new Promise((r) => setTimeout(r, RETRY_PAUSE_S * 1000));
+// 2-3 h old). Up to two more passes for the chains that failed, after a pause that doubles (one pass
+// was not enough for drpc Robinhood "Unknown state", run 40585451906); hours already written stay.
+for (let pass = 1; pass <= 2; pass++) {
+  const retry = chains.filter((c) => runStatus[c.chainId]?.ok === false);
+  if (!retry.length) break;
+  console.log(`retrying ${retry.map((c) => c.slug).join(", ")} (pass ${pass} of 2) in ${RETRY_PAUSE_S * pass} s`);
+  await new Promise((r) => setTimeout(r, RETRY_PAUSE_S * pass * 1000));
   await Promise.all(retry.map(archiveChain));
 }
 failed = chains.some((c) => runStatus[c.chainId]?.ok === false);
