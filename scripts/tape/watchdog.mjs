@@ -6,6 +6,7 @@ import { execFileSync } from "node:child_process";
 
 const repo = process.env.GITHUB_REPOSITORY ?? "AnastasisP/aero-tape-data";
 const TITLE = "Archive watchdog: the tape is not being saved";
+const LABEL = "archive-watchdog";
 const MAX_SAVE_AGE_SECONDS = 2 * 3600;
 const gh = (...args) => execFileSync("gh", args, { encoding: "utf8" }).trim();
 
@@ -29,13 +30,15 @@ if (before.length) problems.push(`Week boundary ${new Date(boundary * 1000).toIS
 if (process.argv.includes("--force-stale")) problems.push("Forced stale state (dry run of the watchdog).");
 const unhealthy = !process.argv.includes("--force-healthy") && problems.length > 0;
 
-const [open] = JSON.parse(gh("issue", "list", "-R", repo, "--state", "open", "--search", `"${TITLE}" in:title`, "--json", "number,title")).filter((i) => i.title === TITLE);
+// UPL-0: only issues this watchdog labelled are its own; a `uplift` issue or any other survives a healthy run
+gh("label", "create", LABEL, "-R", repo, "--force", "--description", "Opened and closed by the archive watchdog");
+const [open] = JSON.parse(gh("issue", "list", "-R", repo, "--state", "open", "--label", LABEL, "--json", "number"));
 const body = `@AnastasisP\n\n${problems.join("\n")}\n\nChecked ${new Date(now * 1000).toISOString()}. Runs: https://github.com/${repo}/actions/workflows/archive.yml`;
 if (unhealthy && open) {
   gh("issue", "edit", String(open.number), "-R", repo, "--body", body);
   console.log(`updated issue #${open.number}:\n${problems.join("\n")}`);
 } else if (unhealthy) {
-  console.log(`opened ${gh("issue", "create", "-R", repo, "--title", TITLE, "--body", body)}:\n${problems.join("\n")}`);
+  console.log(`opened ${gh("issue", "create", "-R", repo, "--title", TITLE, "--label", LABEL, "--body", body)}:\n${problems.join("\n")}`);
 } else if (open) {
   gh("issue", "close", String(open.number), "-R", repo, "--comment", `Recovered ${new Date(now * 1000).toISOString()}: last save ${savedAt}.`);
   console.log(`closed issue #${open.number}`);
