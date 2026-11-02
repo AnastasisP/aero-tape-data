@@ -16,6 +16,8 @@ import { TapeStore } from "./store.mjs";
 import { SERIES_META, TIMEFRAMES, aggregate, deriveHourly, serialize } from "../../lib/data/aero-v3/tape/series.mjs";
 import { resolvePoint } from "../../lib/data/aero-v3/tape/points.mjs";
 import { fetchPrices, priceKey } from "./prices.mjs";
+import { clientFor } from "./client.mjs";
+import { parseAbi } from "viem";
 import { chainMobility, globalSeries } from "../../lib/data/aero-v3/tape/global.mjs";
 import { emissionBand } from "../../lib/data/aero-v3/tape/emissionBand.mjs";
 import { replayTokenTiers } from "./tiers.mjs";
@@ -288,6 +290,27 @@ index.allocThrough = allocThrough;
 // Last archiver run per chain (Frozen data state when it failed).
 const run = store.readState("all", "run");
 index.status = run?.chains ?? {};
+
+// SEC-7: TokenRegistry.isListed at each chain's head, display only. Unread on an RPC failure: the app then falls back to
+// "has a tier", and the next run reads it again.
+if (process.argv.includes("--prices")) {
+  const listedAbi = parseAbi(["function isListed(address) view returns (bool)"]);
+  for (const chain of chains) {
+    const entry = index.chains[chain.chainId];
+    const tokens = Object.keys(entry?.tokens ?? {});
+    if (!tokens.length) continue;
+    try {
+      const client = clientFor(chain);
+      const registry = loadDeployments().files[`leaf-${chain.slug}.json`].addresses.tokenRegistry;
+      const res = await client.multicall({ contracts: tokens.map((t) => ({ address: registry, abi: listedAbi, functionName: "isListed", args: [t] })), allowFailure: true });
+      tokens.forEach((t, i) => {
+        if (res[i].status === "success") entry.tokens[t].listed = res[i].result;
+      });
+    } catch (e) {
+      console.error(`${chain.slug}: isListed not read (${String(e).slice(0, 100)})`);
+    }
+  }
+}
 
 if (process.argv.includes("--prices")) {
   const keys = [];
