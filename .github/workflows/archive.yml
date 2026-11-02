@@ -135,6 +135,12 @@ jobs:
           next=$(( (now / 3600 + 1) * 3600 + 17 * 60 ))
           echo "sleeping $(( next - now )) s until $(date -u -d @$next +%H:%M)Z"
           sleep $(( next - now ))
+      # GitHub starts schedules late on this repo: the watchdog's own schedule stays for a stalled archive, this keeps it hourly
+      - name: Run the watchdog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run watchdog.yml -R "$GITHUB_REPOSITORY" --ref main
+
       - name: Dispatch the next archive run (unless a newer run covers this hour)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
