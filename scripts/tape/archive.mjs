@@ -248,18 +248,21 @@ const untilHardStop = (work) => {
   }, left)));
   return Promise.race([work, stop]).finally(() => clearTimeout(timer));
 };
-await untilHardStop(Promise.all(chains.map(archiveChain)));
-// A56: a load-balanced public RPC sometimes routes a whole run's past-block reads to nodes without
-// that state (drpc Robinhood, 3 of 26 runs on 2026-10-26/27, each leaving the chain's newest sample
-// 2-3 h old). Up to two more passes for the chains that failed, after a pause that doubles (one pass
-// was not enough for drpc Robinhood "Unknown state", run 40585451906); hours already written stay.
-for (let pass = 1; pass <= 2; pass++) {
-  const retry = chains.filter((c) => runStatus[c.chainId]?.ok === false);
-  if (!retry.length || !withinBudget()) break;
-  console.log(`retrying ${retry.map((c) => c.slug).join(", ")} (pass ${pass} of 2) in ${RETRY_PAUSE_S * pass} s`);
-  await new Promise((r) => setTimeout(r, RETRY_PAUSE_S * pass * 1000));
-  await untilHardStop(Promise.all(retry.map(archiveChain)));
-}
+// A56: a load-balanced public RPC sometimes routes a whole run's past-block reads to nodes without that state
+// (drpc Robinhood "Unknown state", 3 of 26 runs on 2026-10-26/27, each leaving the chain's newest sample 2-3 h old).
+// A failed chain retries on its own, after a pause that doubles (at most 5 min), while the budget lasts; hours
+// already written stay. Waiting for the other chains first left it no budget (backlog run 41376751215: +3 hours
+// against +42). Without a budget: two more passes, as before.
+const archiveWithRetries = async (chain) => {
+  await archiveChain(chain);
+  for (let pass = 1; runStatus[chain.chainId]?.ok === false && !abandoned && withinBudget() && (budgetMs || pass <= 2); pass++) {
+    const pause = Math.min(300, RETRY_PAUSE_S * 2 ** (pass - 1));
+    console.log(`retrying ${chain.slug} (pass ${pass}) in ${pause} s`);
+    await new Promise((r) => setTimeout(r, pause * 1000));
+    if (!abandoned) await archiveChain(chain);
+  }
+};
+await untilHardStop(Promise.all(chains.map(archiveWithRetries)));
 for (const c of chains) {
   if (!runStatus[c.chainId]) {
     runStatus[c.chainId] = { ok: false, error: "abandoned at the time budget", cursor: store.cursor(c.chainId) };
