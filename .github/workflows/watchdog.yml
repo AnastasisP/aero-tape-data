@@ -1,0 +1,33 @@
+name: watchdog
+
+# OPS-2: reads the archive from outside the archive job, so a stuck or absent run is still seen.
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Dry run: stale opens or updates the issue, healthy closes it"
+        type: choice
+        options: ["", "stale", "healthy"]
+        default: ""
+
+permissions:
+  contents: read
+  actions: read
+  issues: write
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check the archive
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORCE: ${{ inputs.force }}
+        run: node scripts/tape/watchdog.mjs ${FORCE:+--force-$FORCE}
