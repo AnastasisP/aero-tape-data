@@ -112,6 +112,15 @@ export const relayAbi = parseAbi([
   "function ownerOf(uint256) view returns (address)",
 ]);
 
+/**
+ * relayConfig of the relays that return one head field fewer (factory 0xA5283582951ae0cF72bE4BEA54dA63D199264B78,
+ * read from their raw return). Only tokenId and name are archived; the fields between them stay unnamed.
+ */
+export const relayConfigShortAbi = parseAbi([
+  "struct RelayConfigShort { uint256 tokenId; uint256 field1; uint256 field2; uint256 field3; uint256 field4; uint256 field5; string name; string symbol; }",
+  "function relayConfig() view returns (RelayConfigShort)",
+]);
+
 export const erc20Abi = parseAbi(["function decimals() view returns (uint8)", "function symbol() view returns (string)"]);
 
 // A28: LP-side pool context (IPoolFactory.poolTape, ICLFactory.clPoolTape, IPoolTape /

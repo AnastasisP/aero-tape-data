@@ -1,6 +1,6 @@
 // One hourly tape sample for one chain at one pinned block. Raw class-E reads only:
 // no derived value, no price. Every record carries the A9 provenance fields.
-import { erc20Abi, factoryRegistryAbi, feeCheckpointAbi, leafStateAbi, multicall3Abi, relayAbi, rewardsAbi, rootStateAbi } from "./abis.mjs";
+import { erc20Abi, factoryRegistryAbi, feeCheckpointAbi, leafStateAbi, multicall3Abi, relayAbi, relayConfigShortAbi, rewardsAbi, rootStateAbi } from "./abis.mjs";
 import { MULTICALL3, multicallAt, softMulticallAt } from "./client.mjs";
 import { boundariesBetween } from "../../lib/data/aero-v3/tape/points.mjs";
 
@@ -248,16 +248,20 @@ async function readRelays(client, files, chain, block, prov, known) {
     const [relays] = await multicallAt(client, block, [{ address: factory, abi: relayAbi, functionName: "allRelays", args: [0n, n] }]);
     const fresh = relays.filter((r) => !known.has(lc(r)));
     if (!fresh.length) continue;
-    const res = await multicallAt(
+    const types = await multicallAt(client, block, fresh.map((r) => ({ address: r, abi: relayAbi, functionName: "relayType" })));
+    // Two relayConfig layouts are live: a return that fits neither throws, nothing is guessed.
+    const configs = await softMulticallAt(
       client,
       block,
       fresh.flatMap((r) => [
         { address: r, abi: relayAbi, functionName: "relayConfig" },
-        { address: r, abi: relayAbi, functionName: "relayType" },
+        { address: r, abi: relayConfigShortAbi, functionName: "relayConfig" },
       ]),
     );
     fresh.forEach((r, i) => {
-      out.push(ser({ ...prov, metric: "relay-registry", relay: lc(r), factory: lc(factory), tokenId: res[2 * i].tokenId.toString(), relayType: res[2 * i + 1], name: res[2 * i].name }));
+      const config = configs[2 * i].ok ? configs[2 * i] : configs[2 * i + 1];
+      if (!config.ok) throw new Error(`relayConfig of ${r} fits no known layout at block ${block}`);
+      out.push(ser({ ...prov, metric: "relay-registry", relay: lc(r), factory: lc(factory), tokenId: config.value.tokenId.toString(), relayType: types[i], name: config.value.name }));
     });
   }
   return out;
