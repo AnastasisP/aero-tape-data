@@ -3,7 +3,8 @@ name: archive
 # Hourly: append every complete hour since the last archived one to the `data` branch,
 # verify, then push. GitHub may run schedules late or skip them; the next run backfills
 # the gap from archive-state RPC reads (real chain values only, never estimates).
-# A failed integrity check pushes nothing.
+# A failed integrity check pushes nothing. Raw hours are saved after each batch, before the
+# derived build (OPS-3).
 
 on:
   schedule:
@@ -64,7 +65,7 @@ jobs:
       - name: Archive
         id: archive
         continue-on-error: true
-        run: node scripts/tape/archive.mjs --out tape-data --max-hours 48 --max-minutes 30
+        run: sh scripts/tape/archive-batches.sh
 
       - name: Verify (integrity, continuity, append-only)
         run: node scripts/tape/verify-archive.mjs --dir tape-data --offline
@@ -72,23 +73,11 @@ jobs:
       - name: Exactness (50 random points + one whole hour per chain, re-read at their blocks)
         run: node scripts/tape/verify-exact.mjs --dir tape-data --sample 50
 
+      - name: Push
+        run: sh scripts/tape/save-data.sh
+
       - name: Derived candles (read by the app and the MCP server)
         run: node scripts/tape/build-derived.mjs --dir tape-data --prices
-
-      - name: Push
-        working-directory: tape-data
-        run: |
-          git config user.name "aero-tape-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # derived/ lives on its own branch (A46): drop it from the data branch once, never add it again
-          if git ls-files --error-unmatch derived/v1/index.json > /dev/null 2>&1; then git rm -r -q --cached --sparse derived; fi
-          git add v1 state
-          if git diff --cached --quiet; then
-            echo "nothing new"
-            exit 0
-          fi
-          git commit -q -m "tape: archive run ${GITHUB_RUN_ID}"
-          git push origin HEAD:data
 
       # Derived files are a deterministic rebuild of v1: they live on their own orphan branch,
       # replaced by one commit per run, so they never grow the repo's history (A46).
