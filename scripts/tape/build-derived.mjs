@@ -76,6 +76,7 @@ for (const chain of chains) {
       token1: reg?.token1 ?? null,
       firstHour: points[0].bucket,
       lastHour: last.bucket,
+      activated: last.activated,
       // A41: incentive programs on the gauge, each as first archived (block of the row)
       programs: programsOf(rows, gauge),
       // the newest hour, for market-wide views (water level, A20): class D, token-native
