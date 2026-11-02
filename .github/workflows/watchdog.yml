@@ -4,12 +4,14 @@ name: watchdog
 on:
   schedule:
     - cron: "23 * * * *"
+    # OPS-4: the first hour after the week boundary (Thursday 00:00 UTC) is saved
+    - cron: "45 0 * * 4"
   workflow_dispatch:
     inputs:
       force:
-        description: "Dry run: stale opens or updates the issue, healthy closes it"
+        description: "Dry run: stale or boundary opens or updates the issue, healthy closes it"
         type: choice
-        options: ["", "stale", "healthy"]
+        options: ["", "stale", "healthy", "boundary"]
         default: ""
 
 permissions:
