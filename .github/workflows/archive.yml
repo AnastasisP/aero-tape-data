@@ -64,7 +64,7 @@ jobs:
       - name: Archive
         id: archive
         continue-on-error: true
-        run: node scripts/tape/archive.mjs --out tape-data --max-hours 48
+        run: node scripts/tape/archive.mjs --out tape-data --max-hours 48 --max-minutes 30
 
       - name: Verify (integrity, continuity, append-only)
         run: node scripts/tape/verify-archive.mjs --dir tape-data --offline

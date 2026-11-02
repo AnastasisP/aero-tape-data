@@ -268,12 +268,19 @@ async function readRelays(client, files, chain, block, prov, known) {
  * gaugeSlopeChanges(g, boundary) for every week boundary in (point.ts, t]. Needed to
  * resolve W_g exactly (points.mjs resolvePoint). A past boundary's value is final, so
  * each (gauge, boundary) is archived once.
+ *
+ * Every gauge also gets every boundary inside this hour, whatever its point says now:
+ * weightFlow resolves the PREVIOUS hour's point to t, and a point checkpointed just after
+ * the boundary no longer crosses it (run 40793033274, the first boundary of the archive:
+ * derive threw on such a gauge and no run saved anything for four days).
  */
 async function readSlopeChanges(client, block, prov, leafVoter, gaugeRecords, known) {
   const wanted = [];
+  const t = BigInt(prov.blockTimestamp);
+  const inHour = boundariesBetween(BigInt(prov.bucket) - 3600n, t);
   for (const r of gaugeRecords) {
-    if (r.gaugeState.point.slope === "0") continue;
-    for (const b of boundariesBetween(BigInt(r.gaugeState.point.ts), BigInt(prov.blockTimestamp))) {
+    const crossed = r.gaugeState.point.slope === "0" ? [] : boundariesBetween(BigInt(r.gaugeState.point.ts), t);
+    for (const b of new Set([...crossed, ...inHour])) {
       if (!known.has(`${r.gauge}:${b}`)) wanted.push({ gauge: r.gauge, boundary: Number(b) });
     }
   }

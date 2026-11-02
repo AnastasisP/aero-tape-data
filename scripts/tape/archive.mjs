@@ -32,11 +32,19 @@ function arg(name, fallback) {
 
 const out = arg("out");
 if (!out) {
-  console.error("usage: node scripts/tape/archive.mjs --out <dir> [--max-hours 48] [--chains a,b]");
+  console.error("usage: node scripts/tape/archive.mjs --out <dir> [--max-hours 48] [--max-minutes 30] [--chains a,b]");
   process.exit(2);
 }
 const maxHours = Number(arg("max-hours", "48"));
 const only = arg("chains")?.split(",");
+// A run must reach its verify and push steps inside the job timeout, or all its work is lost (2026-10-29 on:
+// 48 Base hours take over 55 min). No new hour starts after the budget; a read still hanging HARD_STOP_MIN
+// later is abandoned (it has written nothing: an hour is appended only once it is read whole).
+const budgetMs = Number(arg("max-minutes", "0")) * 60_000;
+const HARD_STOP_MIN = 6;
+const startedAt = Date.now();
+const withinBudget = () => !budgetMs || Date.now() - startedAt < budgetMs;
+let abandoned = false;
 
 const chains = loadChains().filter((c) => !only || only.includes(c.slug));
 const { files } = loadDeployments();
@@ -189,9 +197,10 @@ const archiveChain = async (chain) => {
       const start = m.since === "ring" ? Math.max(first, (cursor ?? first) - (RING_HOURS - 1) * HOUR) : first;
       if (cursor === null || (mc ?? start - HOUR) >= cursor) continue;
       let blo = lo;
-      for (let h = (mc ?? start - HOUR) + HOUR; h <= cursor && written < maxHours; h += HOUR) {
+      for (let h = (mc ?? start - HOUR) + HOUR; h <= cursor && written < maxHours && withinBudget(); h += HOUR) {
         const block = await withRetry(() => firstBlockAtOrAfter(client, h, blo, head));
         const { rows, next } = await m.read(store, chain, client, h, block);
+        if (abandoned) return;
         store.appendMetricHour(chain.chainId, m.metric, h, rows);
         store.writeState(chain.chainId, m.state, { bucket: h, ...m.save(next) });
         mc = h;
@@ -200,11 +209,12 @@ const archiveChain = async (chain) => {
       }
       if (mc < cursor) hour = lastComplete + HOUR; // budget spent: new hours wait for the next run
     }
-    for (; hour <= lastComplete && written < maxHours; hour += HOUR) {
+    for (; hour <= lastComplete && written < maxHours && withinBudget(); hour += HOUR) {
       const block = await withRetry(() => firstBlockAtOrAfter(client, hour, lo, head));
       const snap = await withRetry(() => readHourSnapshot(client, chain, files, block.number, hour, programs, gauges, feeCps, slopeKeys, relayKeys, tokenKeys));
       const late = [];
       for (const m of lateMetrics) late.push({ m, ...(await m.read(store, chain, client, hour, block)) });
+      if (abandoned) return;
       const records = [snap.leaf, ...snap.registry, ...snap.gauge, ...snap.programs, ...snap.feeCheckpoints, ...snap.slopeChanges, ...snap.relays, ...snap.tokens, ...late.flatMap((x) => x.rows), ...(snap.root ? [snap.root] : [])];
       store.appendHour(chain.chainId, hour, records, snap.programs, snap.registry, snap.feeCheckpoints, lateMetrics.map((m) => m.metric));
       for (const x of late) store.writeState(chain.chainId, x.m.state, { bucket: hour, ...x.m.save(x.next) });
@@ -227,17 +237,34 @@ const archiveChain = async (chain) => {
     if (process.env.TAPE_DEBUG) console.error(err);
   }
 };
-await Promise.all(chains.map(archiveChain));
+// Up to the hard stop after the budget; a chain still reading then is recorded as failed, its hours written stay.
+const untilHardStop = (work) => {
+  if (!budgetMs) return work;
+  const left = budgetMs + HARD_STOP_MIN * 60_000 - (Date.now() - startedAt);
+  let timer;
+  const stop = new Promise((r) => (timer = setTimeout(() => {
+    abandoned = true;
+    r();
+  }, left)));
+  return Promise.race([work, stop]).finally(() => clearTimeout(timer));
+};
+await untilHardStop(Promise.all(chains.map(archiveChain)));
 // A56: a load-balanced public RPC sometimes routes a whole run's past-block reads to nodes without
 // that state (drpc Robinhood, 3 of 26 runs on 2026-10-26/27, each leaving the chain's newest sample
 // 2-3 h old). Up to two more passes for the chains that failed, after a pause that doubles (one pass
 // was not enough for drpc Robinhood "Unknown state", run 40585451906); hours already written stay.
 for (let pass = 1; pass <= 2; pass++) {
   const retry = chains.filter((c) => runStatus[c.chainId]?.ok === false);
-  if (!retry.length) break;
+  if (!retry.length || !withinBudget()) break;
   console.log(`retrying ${retry.map((c) => c.slug).join(", ")} (pass ${pass} of 2) in ${RETRY_PAUSE_S * pass} s`);
   await new Promise((r) => setTimeout(r, RETRY_PAUSE_S * pass * 1000));
-  await Promise.all(retry.map(archiveChain));
+  await untilHardStop(Promise.all(retry.map(archiveChain)));
+}
+for (const c of chains) {
+  if (!runStatus[c.chainId]) {
+    runStatus[c.chainId] = { ok: false, error: "abandoned at the time budget", cursor: store.cursor(c.chainId) };
+    console.error(`${c.slug}: abandoned at the time budget, cursor ${store.cursor(c.chainId)}`);
+  }
 }
 failed = chains.some((c) => runStatus[c.chainId]?.ok === false);
 // The last run's outcome per chain, for the data state (Frozen when a chain's run failed).
