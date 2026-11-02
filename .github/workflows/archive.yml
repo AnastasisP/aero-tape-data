@@ -26,7 +26,7 @@ jobs:
       group: archive
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
       # Only the manifest, state and the current + previous month of raw files:
       # older day files are never written again (store.mjs SPARSE_DAYS).
@@ -36,7 +36,7 @@ jobs:
           echo "cur=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
           echo "prev=$(date -u -d "$(date -u +%Y-%m-01) -1 day" +%Y-%m)" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: data
           path: tape-data
@@ -48,7 +48,7 @@ jobs:
             /v1/*/*/${{ steps.months.outputs.prev }}/
             /v1/*/*/${{ steps.months.outputs.cur }}/
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 20
           cache: npm
