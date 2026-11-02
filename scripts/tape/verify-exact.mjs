@@ -1,6 +1,6 @@
 // A5 verifier: pnpm tape:verify-exact -- --dir <tape-data> [--sample 50] [--seed n]
 // Exactness: archived values equal a fresh read at the recorded block, to the wei.
-//  a. `--sample` random gauge-state lines from the files on disk, each re-read alone
+//  a. `--sample` random gauge-state lines, an equal share per chain, each re-read alone at a block checked to be its bucket's
 //  b. one random archived hour per chain, re-read whole (every gauge, leaf, root)
 //  c. `--sample` random pool-state lines (A28, LP-side context), each pool re-read alone
 //  d. `--sample` random cl-liquidity lines (A31), each pool re-read alone
@@ -106,16 +106,25 @@ async function confirmGauge(label, archived, firstFresh) {
 
 // a. random gauge-state points
 const gaugeFiles = onDisk("/gauge-state/");
-const totalLines = gaugeFiles.reduce((n, [, m]) => n + m.lines, 0);
+// R-STAT8: stratified by chain. Drawn by line, Arc had no point in 48% of runs; each chain now gets its share.
+const perChain = new Map();
+for (const entry of gaugeFiles) {
+  const id = entry[0].split("/")[0];
+  (perChain.get(id) ?? perChain.set(id, []).get(id)).push(entry);
+}
+const quota = Math.ceil(sampleSize / Math.max(1, perChain.size));
 const picks = new Map(); // rel -> Set(line index)
-for (let i = 0; i < sampleSize && totalLines > 0; i++) {
-  let k = Math.floor(rand() * totalLines);
-  for (const [rel, m] of gaugeFiles) {
-    if (k < m.lines) {
-      (picks.get(rel) ?? picks.set(rel, new Set()).get(rel)).add(k);
-      break;
+for (const entries of perChain.values()) {
+  const total = entries.reduce((n, [, m]) => n + m.lines, 0);
+  for (let i = 0; i < quota && total > 0; i++) {
+    let k = Math.floor(rand() * total);
+    for (const [rel, m] of entries) {
+      if (k < m.lines) {
+        (picks.get(rel) ?? picks.set(rel, new Set()).get(rel)).add(k);
+        break;
+      }
+      k -= m.lines;
     }
-    k -= m.lines;
   }
 }
 let points = 0;
@@ -132,6 +141,12 @@ for (const [rel, idxs] of picks) {
     const g = { gauge: rec.gauge, pool: links[0], rewards: links[1] };
     const leafVoter = files[`leaf-${chain.slug}.json`].addresses.leafVoter;
     const block = BigInt(rec.blockNumber);
+    // R-STAT8: re-reading a line at its own block cannot see a line at the wrong block: its block must be the first
+    // one at or after its bucket
+    const before = await withRetry(() => clientFor(chain).getBlock({ blockNumber: block - 1n })).catch(() => null);
+    if (before === null) unverified.push(`${chain.slug} block ${block - 1n}: not served`);
+    else if (Number(before.timestamp) >= rec.bucket) failures.push(`${rel}:${i + 1}: block ${rec.blockNumber} is not the first at or after bucket ${rec.bucket}: block ${block - 1n} is at ${before.timestamp}`);
+    if (rec.blockTimestamp < rec.bucket) failures.push(`${rel}:${i + 1}: block time ${rec.blockTimestamp} before bucket ${rec.bucket}`);
     const res = await fresh(`${chain.slug} ${rec.gauge} @${rec.blockNumber}`, () =>
       multicallAt(clientFor(chain), block, [
         { address: MULTICALL3, abi: multicall3Abi, functionName: "getCurrentBlockTimestamp" },
