@@ -71,7 +71,11 @@ for (const [gauge, info] of heavy) {
     if (served !== b[i] - a[i]) failures.push(`${gauge} ${token}: Σ served feeYield ${served} != chain Δ ${b[i] - a[i]}`);
   }
   const paying = (info.programs ?? []).filter((p) => p.start <= before.closeTimestamp && p.end >= last.closeTimestamp);
+  const tokensDone = new Set();
   for (const p of paying) {
+    const token = p.token.toLowerCase();
+    if (tokensDone.has(token)) continue;
+    tokensDone.add(token);
     const [weights] = [await withRetry(() => multicallAt(client, BigInt(last.closeBlock), relays.map((id) => ({ address: leafVoter, abi, functionName: "allocations", args: [id, gauge] }))))];
     const k = weights.findIndex((w, i) => w > 0n && relays[i] !== undefined);
     if (k < 0) {
@@ -79,24 +83,26 @@ for (const [gauge, info] of heavy) {
       continue;
     }
     const id = relays[k];
-    const token = p.token.toLowerCase();
-    const [[e1]] = [await read(before.closeBlock, "earnedIncentives", [id, BigInt(p.programId), MAX])];
-    const [[e2]] = [await read(last.closeBlock, "earnedIncentives", [id, BigInt(p.programId), MAX])];
+    // the served incentive part is per token: it sums every program of the token that overlaps the window, so the chain
+    // side sums them too (program 10 starting inside the window read as 30.6% off, 2026-11-02). A program not yet
+    // created at the first block has earned 0 there.
+    const overlapping = (info.programs ?? []).filter((o) => o.token.toLowerCase() === token && o.start < last.closeTimestamp && o.end > before.closeTimestamp);
+    let e1 = 0n;
+    let e2 = 0n;
+    for (const o of overlapping) {
+      if (o.start <= before.closeTimestamp) e1 += (await read(before.closeBlock, "earnedIncentives", [id, BigInt(o.programId), MAX]))[0];
+      e2 += (await read(last.closeBlock, "earnedIncentives", [id, BigInt(o.programId), MAX]))[0];
+    }
     if (e2 <= e1) {
       skipped++;
       continue;
     }
     const part = cs.reduce((s, c) => s + value(c.series.yieldPerWeight?.[token]) - value(c.series.feeYield?.[token]), 0n);
-    const others = paying.filter((o) => o.token.toLowerCase() === token).length;
-    if (others > 1) {
-      skipped++;
-      continue;
-    }
     const want = (part * weights[k]) / 10n ** 24n;
     const off = Math.abs(Number(e2 - e1 - want)) / Number(e2 - e1);
     incentivePairs++;
     worst = Math.max(worst, off);
-    if (off > 0.02) failures.push(`${gauge} program ${p.programId} token ${id}: Δ earnedIncentives ${e2 - e1} vs served ${want} (${(off * 100).toFixed(3)}%)`);
+    if (off > 0.02) failures.push(`${gauge} programs ${overlapping.map((o) => o.programId).join("+")} token ${id}: Δ earnedIncentives ${e2 - e1} vs served ${want} (${(off * 100).toFixed(3)}%)`);
   }
 }
 console.log(`${heavy.length} gauges over ${HOURS} h: ${feePairs} fee pairs exact checks, ${incentivePairs} incentive pairs (worst ${(worst * 100).toFixed(3)}%), ${skipped} skipped`);
