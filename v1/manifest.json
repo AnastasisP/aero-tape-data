@@ -1717,9 +1717,9 @@
       "lines": 225
     },
     "4663/allocation-change/2026-11/2026-11-05.jsonl": {
-      "sha256": "666e28c0cf84ce2c9a3e5187629687334fb30341112cd0061868b83a1a413c6c",
-      "bytes": 24999,
-      "lines": 89
+      "sha256": "c678b1b30fe52c0d42a16fcc66df93ed339d2162a0aec3dcc247d8804b10fc1d",
+      "bytes": 26350,
+      "lines": 94
     },
     "4663/cl-liquidity/2026-10/2026-10-26.jsonl": {
       "sha256": "68b07eb4a8b39b8c5e5efd7d6a73b99f26d5153a4782d2b648c80ac599c2a99f",
@@ -1772,9 +1772,9 @@
       "lines": 1656
     },
     "4663/cl-liquidity/2026-11/2026-11-05.jsonl": {
-      "sha256": "ca24ae0eac1a03cc0c4925a7bf1d5edcd460a07316bb2df2e259fc0bdd5f503e",
-      "bytes": 138401,
-      "lines": 415
+      "sha256": "a0bf25232bc8f07b2166f56875fb3d4f831282b10a32734b236d384620f7f6dc",
+      "bytes": 161736,
+      "lines": 485
     },
     "4663/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "17478500968ba30edf2626dcfee21893f2fb041fe7ed4750a0c24e65b0b42889",
@@ -1842,9 +1842,9 @@
       "lines": 353
     },
     "4663/fee-checkpoint/2026-11/2026-11-05.jsonl": {
-      "sha256": "d5d5a46c6266c299c9eec3164270e33209859688e631ca1a97db9d909a8c8f47",
-      "bytes": 69270,
-      "lines": 153
+      "sha256": "39dda4b80566e8317662c6cb2cf8d24df2051aa30c8384e441d83850e0579cc0",
+      "bytes": 77308,
+      "lines": 171
     },
     "4663/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "8d1f87b38748a875b7726663601ee8ec6462ceee3bba439c850ccff6406efc78",
@@ -1942,9 +1942,9 @@
       "lines": 1656
     },
     "4663/gauge-state/2026-11/2026-11-05.jsonl": {
-      "sha256": "cf8e282d197054dbdfd7006f29d6fc120b3013098d3018f13e21e66170685c03",
-      "bytes": 415572,
-      "lines": 416
+      "sha256": "86015173eaedf3dca427723ee270ee7cae3c8f59e6f77d98035b4ef43868116b",
+      "bytes": 485321,
+      "lines": 486
     },
     "4663/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "ad2c782c10f122a523cbc921eb55398750739013095b0b646b0a2cddb168f3b1",
@@ -2027,9 +2027,9 @@
       "lines": 24
     },
     "4663/leaf-state/2026-11/2026-11-05.jsonl": {
-      "sha256": "0630f1a66aa92df592232bad6a1cb4eaf3c7264e29fddd27c28656c96db18145",
-      "bytes": 4758,
-      "lines": 6
+      "sha256": "06a5d405c3e49534834f929a02ff5c31a5650c217eb249ddb49403e320f5a5e4",
+      "bytes": 5551,
+      "lines": 7
     },
     "4663/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "db16f44d8d832cb937b5ac011c15f0a7ec554047cbc721719b56babf95dc1869",
@@ -2092,9 +2092,9 @@
       "lines": 1656
     },
     "4663/pool-state/2026-11/2026-11-05.jsonl": {
-      "sha256": "59c547d85c52d30df1bf712412164f5ff90f4c94cee3d5cfad94ab8a9af56081",
-      "bytes": 328988,
-      "lines": 415
+      "sha256": "454013f993484e51f6147fdf900523f48bff307d64624e89c80283accdb8d43b",
+      "bytes": 384424,
+      "lines": 485
     },
     "4663/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "e099ba1e36c8c0055810186fb269aada318ade065b1a1ea40dd5134e326ce587",
@@ -2167,9 +2167,9 @@
       "lines": 130
     },
     "4663/token-leaf-state/2026-11/2026-11-05.jsonl": {
-      "sha256": "fd14fc9fc5e1ac632c6c478105d925067f3b2fa0a37d85f474f86047c5fdade8",
-      "bytes": 9038,
-      "lines": 31
+      "sha256": "cb81dadc377367e74cde502c52090e9c05e35cc4bbdf407da6a1fa597dafbbe5",
+      "bytes": 10198,
+      "lines": 35
     },
     "4663/token-registry/2026-10/2026-10-23.jsonl": {
       "sha256": "bf46729ae09c4adf7494f28f79b4f8c9ccddbd4c0792b5584970bb77b9d85db9",
@@ -4020,7 +4020,7 @@
   "cursors": {
     "1": 1793858400,
     "10": 1793858400,
-    "4663": 1793854800,
+    "4663": 1793858400,
     "5042": 1793858400,
     "8453": 1793858400,
     "42161": 1793858400,
@@ -4754,11 +4754,11 @@
       "token-tier": 1793858400
     },
     "4663": {
-      "allocation-change": 1793854800,
-      "token-leaf-state": 1793854800,
-      "pool-state": 1793854800,
-      "cl-liquidity": 1793854800,
-      "token-tier": 1793854800
+      "allocation-change": 1793858400,
+      "token-leaf-state": 1793858400,
+      "pool-state": 1793858400,
+      "cl-liquidity": 1793858400,
+      "token-tier": 1793858400
     },
     "5042": {
       "allocation-change": 1793858400,
@@ -6315,30 +6315,30 @@
       "0x2735e91b68298b9179a98d65bee01a2ef8981553": 7
     },
     "4663": {
-      "0x0fd6cc0e3d1a15f39a197e075b92a3e589ee3fcc": 1413,
-      "0x80988ca88790c08dd261617a594ef760f3c42225": 278,
+      "0x0fd6cc0e3d1a15f39a197e075b92a3e589ee3fcc": 1418,
+      "0x80988ca88790c08dd261617a594ef760f3c42225": 280,
       "0x2333bffbcd6aa441c2242181a3d346a86f49e199": 138,
       "0xbf2bf02828bd1625516f686b394a3d2a9571908f": 17,
       "0x7dc5f17e263712811610b75ccd1352b1f8628d91": 70,
       "0x80e350f9c6216f9ad317a74e614a78958c427c44": 344,
       "0x1fbd69076a3fd4bbc9f3ea28c99406bc3e1824d4": 239,
       "0xeb82b71460be96a60bb24144aab9eba7134d174c": 215,
-      "0x253864ea634f18af2e594a0b5a9249c3be953b18": 87,
+      "0x253864ea634f18af2e594a0b5a9249c3be953b18": 89,
       "0x12ecaaa91118c806cb3f0da96966f6d83256b1fa": 47,
       "0x5ae34829d2a225329e8bd366708912eaaa099919": 53,
       "0x006b8864f5f2b97238f77e6091d2548d4daac3af": 24,
-      "0xaf3a13a07268c83fcf420d48e4cff9bdcb2a59f9": 583,
+      "0xaf3a13a07268c83fcf420d48e4cff9bdcb2a59f9": 587,
       "0xe1977153d64d8070620a99a27ad2db7d6ae33330": 104,
       "0x245972644b6d857aa644c41b9c1f5c5a3456e796": 176,
       "0x9fac230a0461b06c24936592f5e5b9499dc34a55": 28,
-      "0x3085e309cb3820783059f622c7275fc972f7dcb8": 171,
-      "0x991a716ffd7885387f5c10d562c9c64f268fdc65": 78,
+      "0x3085e309cb3820783059f622c7275fc972f7dcb8": 173,
+      "0x991a716ffd7885387f5c10d562c9c64f268fdc65": 79,
       "0x8414e1b4aed54c4133c63e189403591f668276bf": 19,
       "0xb447998a37431c8d10e9050458bdca097e58d34c": 137,
       "0x2bfa61a1abfe725c68a421a0bc3d58ae50218313": 13,
       "0x298c3a1bc0f61913ab131da36e0d6a05436912da": 31,
       "0x5762f34d1e277f75f4ffa40497b746224161cb2b": 35,
-      "0x86985861b79cc9471a856a4fa113efcdfef783f9": 122,
+      "0x86985861b79cc9471a856a4fa113efcdfef783f9": 124,
       "0x87ecaa8037ab5be05172639d9a0ac0ac2e808afb": 23,
       "0x796205227536a64793a4f22d172bbad617e1d0cc": 8,
       "0xefdf3ab3e1aa647faea050b92c7cc299cec233c3": 6,
