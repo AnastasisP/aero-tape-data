@@ -237,9 +237,9 @@
       "lines": 1416
     },
     "1/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "c04a21a252d5a297fa3017b8f478baf719e9dfeb534418f0b53a70a33d0cccba",
-      "bytes": 38966,
-      "lines": 118
+      "sha256": "faea4f161553121930feaeba3a625e059f1f63c2b575efdbf944f371aaeee12f",
+      "bytes": 58443,
+      "lines": 177
     },
     "1/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "d959349e07583734f1bd2d829288c07dd55a5dd9881f07f3560fb64743bb9247",
@@ -522,9 +522,9 @@
       "lines": 1416
     },
     "1/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "3b0a6ed1b30821c3a9ae49a43af57478d8193abbb1bd5d6bfb15476d42041ecf",
-      "bytes": 112510,
-      "lines": 118
+      "sha256": "6bb0d82fbcfd2353bfe44025348bd73906b3d59bcf2acf487be4298cae94de41",
+      "bytes": 168759,
+      "lines": 177
     },
     "1/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "40c991615a7867729a85fc61440f1f032845e62e2475b762176f3598308f93bb",
@@ -672,9 +672,9 @@
       "lines": 24
     },
     "1/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "64a2365dd802c6d9d7ae9f94f70b089c10e6c42a222d4bc2d8dc7d8d7e58aec2",
-      "bytes": 1582,
-      "lines": 2
+      "sha256": "bd32c2439d3854d9816114c3cefdb8e144e2bf419f96963cfc743b853095d635",
+      "bytes": 2373,
+      "lines": 3
     },
     "1/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "1e9f926c3ef8833f37269994f0a2f1eebc2c4bbda691aabfc4b0e7c5b9045736",
@@ -792,9 +792,9 @@
       "lines": 1416
     },
     "1/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "206bc6dfce2f78c403da7860014a68dba507c5cc22a20aa5f31d86fafbe470e6",
-      "bytes": 91740,
-      "lines": 118
+      "sha256": "71e2aea1af3d7ed66e448253a24ebff5e25bd93471182e676d6c8843b122c44b",
+      "bytes": 137609,
+      "lines": 177
     },
     "1/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "9fabfe9df5b2ee264075a4f5125a9778bdd03296b431716274127a204fc7eb3e",
@@ -1177,9 +1177,9 @@
       "lines": 624
     },
     "10/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "c93ef887c02e0f8d720a0feffc745a7cb6dccc5c6c66f3aaa0fccfcf6e891932",
-      "bytes": 17211,
-      "lines": 52
+      "sha256": "b50dcfa03d4599c26d7e3803cf64d4301fba1759964d7dcbf2a0cdb2f8bcdc85",
+      "bytes": 25819,
+      "lines": 78
     },
     "10/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "554eca2b269123461ce87004dd24024afe6e9b679a1c4bfc9ee5be718d7daf4d",
@@ -1462,9 +1462,9 @@
       "lines": 768
     },
     "10/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "6584070af2575c8916b75b47936d352f6ddea8f0849065f19f3507ec52bb0494",
-      "bytes": 66069,
-      "lines": 64
+      "sha256": "f9d01cdc902427255fd886357ab354ce008a2f530fef6ac4c0fe79660b271b70",
+      "bytes": 99084,
+      "lines": 96
     },
     "10/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "c9376b9454e63ed6bffd9496baf1b490501228e25cd0a95d799b686b20d5830c",
@@ -1622,9 +1622,9 @@
       "lines": 24
     },
     "10/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "4dc1c0c1364f3c4b635c6242b58d27e51cb40ea2a182225c67cb6aec2ba263ec",
-      "bytes": 1586,
-      "lines": 2
+      "sha256": "e7d8b8243bd54df34a679d110e6b3272017d1bf393719f6d3c39b18be207abec",
+      "bytes": 2379,
+      "lines": 3
     },
     "10/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "98f718c4d0d87b874943721ad0156ee00b65a7eda9780c395137c91ed5dc9756",
@@ -1742,9 +1742,9 @@
       "lines": 768
     },
     "10/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "28d1e0b08185448b6f3e3dec90e796803c74e6afb8379b3e1826304ac429325a",
-      "bytes": 52874,
-      "lines": 64
+      "sha256": "1e769a2f35e87fe75896f94a115f7f6df8262902d0db1fc5d3b8226c44e65e7c",
+      "bytes": 79311,
+      "lines": 96
     },
     "10/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "1717a328d0c7ab3c06c9ebf9fa2e9d10e9ce0b843cec70bf723d8bba855873a3",
@@ -2022,9 +2022,9 @@
       "lines": 32
     },
     "42161/allocation-change/2026-11/2026-11-16.jsonl": {
-      "sha256": "3269b6b0c6b907d2db4801f94f0b34da002337fddd59ac163ce602580fd20d3f",
-      "bytes": 2671,
-      "lines": 10
+      "sha256": "5a3f6b1ceb20be3d1f86e138abc2939cc07a7e7c66b8f438e93e124a89deceea",
+      "bytes": 2938,
+      "lines": 11
     },
     "42161/cl-liquidity/2026-10/2026-10-26.jsonl": {
       "sha256": "d87bd31df3b7b78a1c782eb77557d39c40bc28b4e9b0017e90d6fc2c360e4dbe",
@@ -2132,9 +2132,9 @@
       "lines": 1344
     },
     "42161/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "ef2577ef64b602bab1fac3161391c0f27e74ce26f81ecf2c07e8a9fa67df8a12",
-      "bytes": 36638,
-      "lines": 112
+      "sha256": "5fe10a8c9ab8487d87cf8cfde208e7b13f6572ba6b12e3a0e523b657f42fb8ca",
+      "bytes": 54960,
+      "lines": 168
     },
     "42161/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "526039845e9eb5ae3cd46acec134cbfaa4b0a179aa023c643caff25845e53517",
@@ -2257,9 +2257,9 @@
       "lines": 75
     },
     "42161/fee-checkpoint/2026-11/2026-11-16.jsonl": {
-      "sha256": "537f2e500f8391a96ff5518e3121b4244814011da0aed3218bcf706b34a3e66c",
-      "bytes": 6220,
-      "lines": 14
+      "sha256": "a56e9ab51c5a1d42747f3fd85a9c9e6da708bf622894712812a9889295fbf8a4",
+      "bytes": 7518,
+      "lines": 17
     },
     "42161/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "2126a5ecc941a029b328ae82d73b9aa06c3898fb14fcd6e7e1adb96538411996",
@@ -2417,9 +2417,9 @@
       "lines": 1344
     },
     "42161/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "fcca154096a2dcd7d5adc22b336050b04d6afd51a53b5f7d58e7a4c4296b7381",
-      "bytes": 106182,
-      "lines": 112
+      "sha256": "7abf6e17832310745445bfc668d07f438fe5dac35a3e4daf2626ce5859c8c90a",
+      "bytes": 159227,
+      "lines": 168
     },
     "42161/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "02e22581a1b1c91b49dac2c319d0bdadc08eec39734a110542b565663342272f",
@@ -2562,9 +2562,9 @@
       "lines": 24
     },
     "42161/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "5252f7f71e560d941e041ba7cafcd60b79e8e0bc43a8ddeff2fc7d3f59cf2683",
-      "bytes": 1592,
-      "lines": 2
+      "sha256": "c1509d852a2f120e2110e034e61c66370c6b00edaeb8a94bf2d69840b6fa5d63",
+      "bytes": 2388,
+      "lines": 3
     },
     "42161/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "c9a7311dd4e5660fdc471d86ac6187390270745e11463410d0d88bc0cb85722a",
@@ -2682,9 +2682,9 @@
       "lines": 1344
     },
     "42161/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "72d04dae8cf00cf3b2f21c3f840db66cda5a2c1d4048e5cac95c1a1a0b8ad3da",
-      "bytes": 87163,
-      "lines": 112
+      "sha256": "55766e5715d895981be6fa96706fc41a20fa599910fe18d02951a8ff199d2912",
+      "bytes": 130743,
+      "lines": 168
     },
     "42161/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "f5005ed3f61bb0afc3ffd445540614e63e659dfcc55d7d780cf3fcd66cbe8067",
@@ -2812,9 +2812,9 @@
       "lines": 21
     },
     "42161/token-leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "a3d4abb137290854386f06b44c35e03d2aca022314fdb94fb8a90a3090a8a3d2",
-      "bytes": 2981,
-      "lines": 10
+      "sha256": "503a74656b781ff6bfc1073e234269d9234372638792c9cc88401d9ad6dcbe5a",
+      "bytes": 3272,
+      "lines": 11
     },
     "42161/token-registry/2026-10/2026-10-23.jsonl": {
       "sha256": "d6774d790050561c366581badc53b6ef99a31e93c1dc0fa24c04956f00c075ab",
@@ -3077,9 +3077,9 @@
       "lines": 1848
     },
     "4663/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "9174ef70f1c36e8b8a4ae9977bb8b77f7a3726cd28fbb958f8d3c35f9b316cd6",
-      "bytes": 51456,
-      "lines": 154
+      "sha256": "03e37db304968730228b5df225e174b2761ef5ae3db639e130a6bd8d6ce6b464",
+      "bytes": 77184,
+      "lines": 231
     },
     "4663/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "17478500968ba30edf2626dcfee21893f2fb041fe7ed4750a0c24e65b0b42889",
@@ -3202,9 +3202,9 @@
       "lines": 199
     },
     "4663/fee-checkpoint/2026-11/2026-11-16.jsonl": {
-      "sha256": "423f8e1c5adb4ab52591cd6eecc8b58c9f7d00b126d0bde4c7debdbee92e3fb7",
-      "bytes": 7201,
-      "lines": 16
+      "sha256": "55b86cdd6ddc7bb8cd43a0d439680f2688d608baf6582e267c616f5a0097b2db",
+      "bytes": 7644,
+      "lines": 17
     },
     "4663/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "8d1f87b38748a875b7726663601ee8ec6462ceee3bba439c850ccff6406efc78",
@@ -3372,9 +3372,9 @@
       "lines": 1848
     },
     "4663/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "a33cca204fd82b7bdc6145754b11801db9f3b5737ae8291c09f9c8f3b7efe82e",
-      "bytes": 153329,
-      "lines": 154
+      "sha256": "8594b9fa444b80a246c4c85e9f32b38aa470feeb22905ba491045f3e4758caea",
+      "bytes": 229948,
+      "lines": 231
     },
     "4663/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "ad2c782c10f122a523cbc921eb55398750739013095b0b646b0a2cddb168f3b1",
@@ -3512,9 +3512,9 @@
       "lines": 24
     },
     "4663/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "c629e4e88660aac6bc62cfc77cc34db0049dea9de46f30e8847edc997227b366",
-      "bytes": 1590,
-      "lines": 2
+      "sha256": "a7a48db2a1edb85ff80356cc29a668d2cca847a3c8289e17529b5660db2f4801",
+      "bytes": 2385,
+      "lines": 3
     },
     "4663/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "db16f44d8d832cb937b5ac011c15f0a7ec554047cbc721719b56babf95dc1869",
@@ -3632,9 +3632,9 @@
       "lines": 1848
     },
     "4663/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "5b65b8ee8678c4d419dfd8b4a57b4c97dc7eb80cb62a63476885bc369aee7cb7",
-      "bytes": 121843,
-      "lines": 154
+      "sha256": "66d21b91b47c974783437abdd0ed777a3f1ecb8f8160adbe2cc1a90b4cce049e",
+      "bytes": 182768,
+      "lines": 231
     },
     "4663/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "e099ba1e36c8c0055810186fb269aada318ade065b1a1ea40dd5134e326ce587",
@@ -4022,9 +4022,9 @@
       "lines": 168
     },
     "5042/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "09883d947017836bb11ebd6282ef18af5c195b2b2a7b716bf6dcb60a1ff4ffc4",
-      "bytes": 4535,
-      "lines": 14
+      "sha256": "a5b7a65e407273ee97824b839b382cac82051c679f57ee5e09664750c93a6092",
+      "bytes": 6805,
+      "lines": 21
     },
     "5042/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "a486fbdadb60cca42ce6ad89684f91f27a6871951536c9119e1b017a7d6a11fb",
@@ -4297,9 +4297,9 @@
       "lines": 168
     },
     "5042/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "4b1ffd0f7b1620829a70a7a2e8bf6207e799dbca7709db8f1f91947f43e66d94",
-      "bytes": 13974,
-      "lines": 14
+      "sha256": "1a550b8e3c6245c6871fed0d53b360022b4edcc6ac26eb69bd8ed344603d78b9",
+      "bytes": 20961,
+      "lines": 21
     },
     "5042/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "2589eddede6b2f842de6132ee6818ab0020d219106270458682f03283f84e5b5",
@@ -4432,9 +4432,9 @@
       "lines": 24
     },
     "5042/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "7e7ff2d8920a514756378a1c1363c74d23cb5f067daf75dd6fca8eecc88cf0e8",
-      "bytes": 1576,
-      "lines": 2
+      "sha256": "8410d743f8b39c0fbaf142b713b4938320cf78dc392d1c04c47e20e9d7b3198c",
+      "bytes": 2364,
+      "lines": 3
     },
     "5042/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "25625f0430f836ea7a715674f83f7e293b58de65dff944f0cc5e3e86d195701f",
@@ -4552,9 +4552,9 @@
       "lines": 168
     },
     "5042/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "5ff20ade6939b3a8f8787fa1b119e0a835780a8bdd7594215876b92bb8d997de",
-      "bytes": 11108,
-      "lines": 14
+      "sha256": "40adcda64f111dd2df0967feafdd1c1ea13cea27863dd7d83c3f7fbf8c043dad",
+      "bytes": 16662,
+      "lines": 21
     },
     "5042/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "f0a13825a23883fd5f472bf6a1ddfc32ff6e0be6de52c8fc015206341a921b15",
@@ -4817,9 +4817,9 @@
       "lines": 20
     },
     "57073/allocation-change/2026-11/2026-11-16.jsonl": {
-      "sha256": "f505d1867561ab010122b56f1e5367fd45ad71b9353d33f829a52fd61233b7d5",
-      "bytes": 2149,
-      "lines": 8
+      "sha256": "871158c926ece78644fbaaf7a1c01d1dffb228ac9cff973faafd21590dfe638e",
+      "bytes": 3213,
+      "lines": 12
     },
     "57073/cl-liquidity/2026-10/2026-10-26.jsonl": {
       "sha256": "1ffae6f9209318e87396baa9dffc9116c7e50607774644b870b0c5e80c2dd7b0",
@@ -4927,9 +4927,9 @@
       "lines": 504
     },
     "57073/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "d72f3131c39e877714c9b6b6ccfafb5d1f3c73b45b81c0aa3427aa2d4901c39f",
-      "bytes": 13323,
-      "lines": 42
+      "sha256": "e54f79cdc13569f8f488ce472167ccc062235d42d7441b2c6b0c985ccf9f2236",
+      "bytes": 19982,
+      "lines": 63
     },
     "57073/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "a3af73b2b9777fc57d4489aa30b9464dee67190d2bc66c810445572d512af6e6",
@@ -5052,9 +5052,9 @@
       "lines": 44
     },
     "57073/fee-checkpoint/2026-11/2026-11-16.jsonl": {
-      "sha256": "7ba84fc7cf55db66e4b534ef1b2093ffa4e76856c73f1936dc0b0bb4aa313c5b",
-      "bytes": 4342,
-      "lines": 10
+      "sha256": "04c75218b8099cbd4cab49fe01c4cd7913566c6bee341ad71ec4f0b1bef4c484",
+      "bytes": 6985,
+      "lines": 16
     },
     "57073/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "655d097ae4e363d94c73421a9102d3f069b2415f0f4d8ea02c1d947e8188be52",
@@ -5207,9 +5207,9 @@
       "lines": 504
     },
     "57073/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "c9268ea95c233107e5c0ebea571893bfe0e672a0058e6a94a80357c76ec953a7",
-      "bytes": 39354,
-      "lines": 42
+      "sha256": "0be1febff77005f823ca2d1cfbecc5dbb977ce0b185493030d3016576612dca3",
+      "bytes": 59029,
+      "lines": 63
     },
     "57073/leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "1158603c516921153cd4e21a5f6aab1f0c076fc487a0caaabf20ec463bbef922",
@@ -5337,9 +5337,9 @@
       "lines": 24
     },
     "57073/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "9a71087536dffadb28222eb2f579c778052d82c53940dc799467be7d1f59e295",
-      "bytes": 1588,
-      "lines": 2
+      "sha256": "4457e964837ed8c21ae4a6f622960c63cab14ca406c17664d9105635af608ed2",
+      "bytes": 2382,
+      "lines": 3
     },
     "57073/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "fd64873577ea777127ee7b3d193581345814b1d29ef1ae7c7a208b6408493dec",
@@ -5457,9 +5457,9 @@
       "lines": 504
     },
     "57073/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "85795cd1deab73329bc34a774c22dfae9470bd3c2c5fde4c0309ab22c3d63bcf",
-      "bytes": 31658,
-      "lines": 42
+      "sha256": "8ed3f1c81ca86ff4b48646c3355cec774a5426e43d1152e0e1cd0ac45e96514f",
+      "bytes": 47487,
+      "lines": 63
     },
     "57073/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "5875330131a2ce904711acc09a0e80bf548b8fab32733ae439cee89401c4aaad",
@@ -5587,9 +5587,9 @@
       "lines": 16
     },
     "57073/token-leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "6107c8170443c5abc8140d9067412fff9830c9565639b30cf93d4048ecdadd3a",
-      "bytes": 1770,
-      "lines": 6
+      "sha256": "3f4e4a9ac819eae33ffdf475ed4bd9626df6f2e9601e4cee3063ffea134ecc7b",
+      "bytes": 2930,
+      "lines": 10
     },
     "57073/token-registry/2026-10/2026-10-23.jsonl": {
       "sha256": "fb652ce16c71a224955ba512f5042d040ed9c8b78156c37978e49f5904dd5453",
@@ -5737,9 +5737,9 @@
       "lines": 4127
     },
     "8453/allocation-change/2026-11/2026-11-16.jsonl": {
-      "sha256": "a3a8ec5012a95be770838ec118aa176d87bc1cd72262549ad0c2d1d9e03a2c23",
-      "bytes": 177823,
-      "lines": 643
+      "sha256": "daaeb9c68be4d10e5ab76d476d00391fca958cab704405c9d1a2adccc7f2eb27",
+      "bytes": 234591,
+      "lines": 848
     },
     "8453/cl-liquidity/2026-10/2026-10-26.jsonl": {
       "sha256": "1c73b01ee9e533ace185c11f0eb6527760b50a09484df8bf231154f242e89ced",
@@ -5847,9 +5847,9 @@
       "lines": 6648
     },
     "8453/cl-liquidity/2026-11/2026-11-16.jsonl": {
-      "sha256": "db30f0bd0dcc1ad6ae32ca9a517449ac40fb1bd6450a01a3102cad51b3bee5b6",
-      "bytes": 183120,
-      "lines": 554
+      "sha256": "b9ae9c05e48e22320181f7224e82f4eedaf53b1322d12473288270f066dbc344",
+      "bytes": 274679,
+      "lines": 831
     },
     "8453/fee-checkpoint/2026-10/2026-10-23.jsonl": {
       "sha256": "d8469c445f84db29417260ccaa9ddb741e6fc1906dae130a32acf107b2a35ef8",
@@ -5972,9 +5972,9 @@
       "lines": 8966
     },
     "8453/fee-checkpoint/2026-11/2026-11-16.jsonl": {
-      "sha256": "f21d5ea708ea6711f4abd834bf2d0daada3c193d142eeced6396a668783c0823",
-      "bytes": 420650,
-      "lines": 935
+      "sha256": "7baebcc29601b30bbbc153951b4e58ac008843adcb355166fef0a4787d2a0cb8",
+      "bytes": 565105,
+      "lines": 1258
     },
     "8453/gauge-registry/2026-10/2026-10-22.jsonl": {
       "sha256": "cca908d4f7409dab3ed609346e76072a64fd4a435162e445b95427641c3e8df1",
@@ -6152,9 +6152,9 @@
       "lines": 7464
     },
     "8453/gauge-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "cd0471c8d6f8ddb301d9f1828fc3fa046a3b350039d59c5629a7cce4f693e15e",
-      "bytes": 644709,
-      "lines": 622
+      "sha256": "bd2309e65fe24bac21c0a44b2dde2f62c58c6892c23251e4104969a6a71962ff",
+      "bytes": 967026,
+      "lines": 933
     },
     "8453/incentive-program/2026-10/2026-10-22.jsonl": {
       "sha256": "d6d9b2a8ac71cb0e11614da2d4656b18ebbc59926184d8571bffa9601f20eead",
@@ -6387,9 +6387,9 @@
       "lines": 24
     },
     "8453/leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "8f41b3f39a0484aed0b648baee229bfad4fc04a0ebf0845cc5ea3e67264508df",
-      "bytes": 1622,
-      "lines": 2
+      "sha256": "1d52982519783697b22f98b16309f9ea28fa90f3ae9276920e3f8a7e9d7d4cbb",
+      "bytes": 2433,
+      "lines": 3
     },
     "8453/migration-state/2026-10/2026-10-22.jsonl": {
       "sha256": "ad0f4ce7d31cfbabd0c07474ea38541ebed472297b6b8f995907cf1e573af76b",
@@ -6517,9 +6517,9 @@
       "lines": 24
     },
     "8453/migration-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "ecf0d2b7e43ccde53f991a67430c449db42367be5402e3bd9f6ac32660a2cd2c",
-      "bytes": 872,
-      "lines": 2
+      "sha256": "bf57e6980a2e99962e10af78c28f914b49caa4f48191acffd64d67bc813d1dc6",
+      "bytes": 1308,
+      "lines": 3
     },
     "8453/pool-state/2026-10/2026-10-24.jsonl": {
       "sha256": "e5cd785338ac4ba3eb766946124b39b8409ce8bb963d7790124d54f50fa1d049",
@@ -6637,9 +6637,9 @@
       "lines": 7464
     },
     "8453/pool-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "aaf6363c77613727e7411f4fc47efe9011dd64d86eabe73c9a7870f5fcd8e015",
-      "bytes": 507157,
-      "lines": 622
+      "sha256": "d3866093eb6ad3ca6b7befda9e837da555f23172f540a06c4ce7bde2d3d48150",
+      "bytes": 760741,
+      "lines": 933
     },
     "8453/relay-registry/2026-10/2026-10-23.jsonl": {
       "sha256": "29fd9914e5d43ad0f8652623c0396d85847fbfe0b3e399dfe974857bd0934b03",
@@ -6777,9 +6777,9 @@
       "lines": 24
     },
     "8453/root-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "c440cc25dd494c19f70ca50667e04eb67c8d42824828eb8fdb31a22b2fc71a2a",
-      "bytes": 8828,
-      "lines": 2
+      "sha256": "51797bc30b49ff548b6465763bc51ec3a3f8736587445806cbd2dd34b8f5d737",
+      "bytes": 13242,
+      "lines": 3
     },
     "8453/token-leaf-state/2026-10/2026-10-22.jsonl": {
       "sha256": "37464acbb0fed532af4a5a57d2b462f0485aa8893a74c4db2c9a21731e1a4aae",
@@ -6907,9 +6907,9 @@
       "lines": 1229
     },
     "8453/token-leaf-state/2026-11/2026-11-16.jsonl": {
-      "sha256": "99886116849662fbf990cb531ab0c9685921885dff0d899ff07fe298b5e922f5",
-      "bytes": 43835,
-      "lines": 151
+      "sha256": "8bc9382cabe9ae744a7a403b610d190a7e51dc52f0907a9b13e7fdddf4118cb4",
+      "bytes": 62156,
+      "lines": 214
     },
     "8453/token-registry/2026-10/2026-10-23.jsonl": {
       "sha256": "b62e7888e5acab3a895c5765f97da37b83b2915b4f9985ad321cde272842b0a0",
@@ -6978,13 +6978,13 @@
     }
   },
   "cursors": {
-    "1": 1794790800,
-    "10": 1794790800,
-    "4663": 1794790800,
-    "5042": 1794790800,
-    "8453": 1794790800,
-    "42161": 1794790800,
-    "57073": 1794790800
+    "1": 1794794400,
+    "10": 1794794400,
+    "4663": 1794794400,
+    "5042": 1794794400,
+    "8453": 1794794400,
+    "42161": 1794794400,
+    "57073": 1794794400
   },
   "programs": {
     "1": {
@@ -7741,54 +7741,54 @@
   },
   "metricCursors": {
     "1": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     },
     "10": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     },
     "4663": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     },
     "5042": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     },
     "8453": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "migration-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "migration-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     },
     "42161": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     },
     "57073": {
-      "allocation-change": 1794790800,
-      "token-leaf-state": 1794790800,
-      "pool-state": 1794790800,
-      "cl-liquidity": 1794790800,
-      "token-tier": 1794790800
+      "allocation-change": 1794794400,
+      "token-leaf-state": 1794794400,
+      "pool-state": 1794794400,
+      "cl-liquidity": 1794794400,
+      "token-tier": 1794794400
     }
   },
   "slopeChanges": {
@@ -9869,7 +9869,7 @@
       "0x11ad97bcb9e41ca58c781a661e731992dd8c0b12": 21
     },
     "4663": {
-      "0x0fd6cc0e3d1a15f39a197e075b92a3e589ee3fcc": 1785,
+      "0x0fd6cc0e3d1a15f39a197e075b92a3e589ee3fcc": 1786,
       "0x80988ca88790c08dd261617a594ef760f3c42225": 533,
       "0x2333bffbcd6aa441c2242181a3d346a86f49e199": 259,
       "0xbf2bf02828bd1625516f686b394a3d2a9571908f": 27,
@@ -9943,18 +9943,18 @@
     },
     "8453": {
       "0x09ad4a8e715a25aa8ac91f6840005a8affcda139": 2455,
-      "0xe43e4d06d85abfed8bd998c5df2dcfe272c4e8c9": 1523,
-      "0x3f0d81773baf395ea1d56e0488206cad80bb1e17": 1118,
+      "0xe43e4d06d85abfed8bd998c5df2dcfe272c4e8c9": 1525,
+      "0x3f0d81773baf395ea1d56e0488206cad80bb1e17": 1134,
       "0xd2d5442d7a63b6b13cbf1f79ec1fe7c592ea8438": 41,
       "0x6a9916d352ece1e2b63ed007ede983c9f03f3e71": 901,
       "0x31ae396e939f183263d185556426be8315c3b8d5": 204,
       "0xa8d3f0ba97899920932f2d95fdb33a57bb6f116b": 158,
-      "0x005a0149377cc0c441572d823035a0411d0d131b": 1039,
+      "0x005a0149377cc0c441572d823035a0411d0d131b": 1042,
       "0xa3d0e886f069ebe782913657d866c950bd101d74": 58,
       "0xeb7988755a49fa5d20c4f19f90a0b0429d8d8f6b": 37,
       "0xb353ef351dcd92c0b03bbc4fa863107a21e930e8": 26,
-      "0x85c8e66fcdd3348752a81ee3f5be97056f9ac0c3": 310,
-      "0x06fcfb87726c1c4c4beb7bfbbfdfe0ee2cc7d121": 453,
+      "0x85c8e66fcdd3348752a81ee3f5be97056f9ac0c3": 311,
+      "0x06fcfb87726c1c4c4beb7bfbbfdfe0ee2cc7d121": 454,
       "0x6825a5df377f741650578c9e3ed46984f2dc2723": 611,
       "0x801c2bf0c1af095d154765eb25f49d108abd8feb": 199,
       "0x599733aeec5d0d7ab0170cda3493e6ab5d5d7b08": 135,
@@ -9966,69 +9966,69 @@
       "0xe97ff7d4cb2271a32d8f32beee2a62ce371f8697": 217,
       "0xdeed7a73ccfe985609f1f7832c9aa0dd733f541b": 242,
       "0x9bc14d9f505ba3ad634f072b1935e0212c296a73": 33,
-      "0x1085b4f49dc776a04a9467b57c271fe4c157789a": 1668,
+      "0x1085b4f49dc776a04a9467b57c271fe4c157789a": 1670,
       "0xa88d649f22dda3d3123921113ce874573ed151aa": 674,
       "0x6a8a450e2b4674c662bb332f96708242cd781a2a": 2492,
       "0x6504a52e65f1ebdeb297562df368d6df8349ab51": 2,
       "0x2dd902d6bdc85aa40772b8704c6fa6652066abb8": 3,
       "0x4e7f06c50979d5700f5cf65c89c4241cab53aae3": 103,
-      "0xe13a18e7eb6411e8f761910832e60e0fb845a212": 6354,
-      "0x1aa768ab1195a9586175fd680704da70ab793172": 2557,
-      "0x623de2a4cb208e8498ae888ec1ec805a105fef48": 11800,
-      "0x50936374116ea5ba61770f6a4f341f256665d4b3": 3173,
-      "0x40293b3aa4cda39c16879ed176fe8d4ccaded196": 1213,
+      "0xe13a18e7eb6411e8f761910832e60e0fb845a212": 6360,
+      "0x1aa768ab1195a9586175fd680704da70ab793172": 2562,
+      "0x623de2a4cb208e8498ae888ec1ec805a105fef48": 11817,
+      "0x50936374116ea5ba61770f6a4f341f256665d4b3": 3180,
+      "0x40293b3aa4cda39c16879ed176fe8d4ccaded196": 1214,
       "0xedbf0ee041574cecded59886cc0d4de2856e51a8": 24,
-      "0x5426e4b968f43ac88e90d1a71c38a148618e1542": 3693,
-      "0x45bf43ecd849c6aedbaa86cae629ebbb392b89a1": 6496,
-      "0x73e8fb47d9d6df4d102588d45be055ba84bcc2dd": 47,
-      "0x76ee14bf2a644feab94828d7b804e331eb479d19": 4450,
+      "0x5426e4b968f43ac88e90d1a71c38a148618e1542": 3702,
+      "0x45bf43ecd849c6aedbaa86cae629ebbb392b89a1": 6508,
+      "0x73e8fb47d9d6df4d102588d45be055ba84bcc2dd": 48,
+      "0x76ee14bf2a644feab94828d7b804e331eb479d19": 4459,
       "0xdb23a1d51be45df0940e1402bae1c340175932ea": 1469,
       "0xc41f2e0dbc5956f23a021266356ff85534d79597": 325,
-      "0xf35a9b45e4e9cf25324798e256172db92aea3666": 1066,
-      "0xd54d3290d59d6e1f50848ed3f75783f677dda043": 3225,
-      "0xa5c85d37a14c82d5710a28dd68e66356bbbe9152": 1355,
+      "0xf35a9b45e4e9cf25324798e256172db92aea3666": 1067,
+      "0xd54d3290d59d6e1f50848ed3f75783f677dda043": 3227,
+      "0xa5c85d37a14c82d5710a28dd68e66356bbbe9152": 1356,
       "0xcf43266e46b0259c26ec9dc1afb6db19fa5c6ac1": 1466,
-      "0x7cb2aa9d8fc0f7a5e1e59d77844acdba99184547": 3575,
+      "0x7cb2aa9d8fc0f7a5e1e59d77844acdba99184547": 3578,
       "0xb4bf35dec191542e1cf7fb4c2648a6a7f1951c40": 1882,
-      "0x5f2fdf050de1e109f740a19acd80d894c540c3b0": 2055,
-      "0xb4f9417e8b700c65400d28499fae2bf415cce012": 6742,
-      "0x7c59f28948414a1474bac7e1623eebd17b2f07b4": 996,
-      "0x3300bff3ce45825c84febff1ffe6b5eda76d3f97": 2291,
+      "0x5f2fdf050de1e109f740a19acd80d894c540c3b0": 2056,
+      "0xb4f9417e8b700c65400d28499fae2bf415cce012": 6754,
+      "0x7c59f28948414a1474bac7e1623eebd17b2f07b4": 997,
+      "0x3300bff3ce45825c84febff1ffe6b5eda76d3f97": 2294,
       "0x31082555ddcb31b5f82da2b08b566228e84614e4": 31,
-      "0xfecfdb37189cf5ad415b34a34e4efe9d2c52e63f": 3804,
-      "0xcb7144fa56fe545b0a6557874fee773ddcab7e84": 1540,
-      "0x0efaecbc3db1a6ebdabd1641e64ba01c813faf8a": 684,
+      "0xfecfdb37189cf5ad415b34a34e4efe9d2c52e63f": 3821,
+      "0xcb7144fa56fe545b0a6557874fee773ddcab7e84": 1542,
+      "0x0efaecbc3db1a6ebdabd1641e64ba01c813faf8a": 689,
       "0x24589d93932ff5c6f5f9fbfc2c90178daea4472b": 1799,
       "0x062cfba14ba7339b6dcce4a379b27b8e23557ea9": 447,
-      "0xbe91f4e0b11c629d2534c00c5fd858f2b34989d4": 4632,
-      "0xbe46863020ed49f89e04cf23b0bc05fee2420a11": 1211,
+      "0xbe91f4e0b11c629d2534c00c5fd858f2b34989d4": 4636,
+      "0xbe46863020ed49f89e04cf23b0bc05fee2420a11": 1212,
       "0x1fb3f85f1feaaa55abc540994874f2c1f86b52d1": 580,
-      "0xc64eb9546032fb2dd372c9c94196afacf2c1d70f": 1138,
-      "0x4884919f2026808cc060b3d462062a92a393ca1d": 2415,
+      "0xc64eb9546032fb2dd372c9c94196afacf2c1d70f": 1140,
+      "0x4884919f2026808cc060b3d462062a92a393ca1d": 2418,
       "0xe7a863189ed471ff57ff3c7e80ec5068e1453bd1": 877,
       "0xaee02ea6d5dd66e301370628d820124a498a4c2d": 136,
-      "0xf1625ae57aaa07825cef6bdf6654eb635851bdee": 661,
+      "0xf1625ae57aaa07825cef6bdf6654eb635851bdee": 662,
       "0x4636eca491c272d991ec552418fd12d8baaed4ee": 103,
-      "0xeae4e8a98950c9bfd3409b6b393d728cbe88a88f": 5661,
+      "0xeae4e8a98950c9bfd3409b6b393d728cbe88a88f": 5669,
       "0x945c6800e53db538afaa1e0bc8937f61dd4276d8": 48,
-      "0x48654da89d4f73e65efda616d30eddb107d1718d": 889,
-      "0xe1717637e87a9e6170caa73a606db66d4a7d45db": 3291,
+      "0x48654da89d4f73e65efda616d30eddb107d1718d": 890,
+      "0xe1717637e87a9e6170caa73a606db66d4a7d45db": 3293,
       "0x1210a244218a52d3b69d9fd75ca56fa46bb3d50e": 35,
       "0x2ec42419cd47581d6f8f05f8bfd6b4a0c9b8479e": 96,
-      "0x380d8559d6e661cc5218964b8d13b9b9edc5fbe5": 1646,
-      "0x03083fe7831aec75839b28932b065bbd74dce6f6": 2569,
-      "0x262b12f6b39b4a1bea64fd7474fcfb8648c20176": 1926,
-      "0x1550c95a4033988a9b944f31f040bccc6016a9dc": 1285,
-      "0x29d500281f4416994ad4d27529d75c058717ceb2": 798,
+      "0x380d8559d6e661cc5218964b8d13b9b9edc5fbe5": 1647,
+      "0x03083fe7831aec75839b28932b065bbd74dce6f6": 2571,
+      "0x262b12f6b39b4a1bea64fd7474fcfb8648c20176": 1927,
+      "0x1550c95a4033988a9b944f31f040bccc6016a9dc": 1286,
+      "0x29d500281f4416994ad4d27529d75c058717ceb2": 800,
       "0xb460ef2f1d90797be725d7ff11c988d049043b85": 684,
-      "0x95353c63852e85402eb93a73f7076d3e3d83f027": 3322,
+      "0x95353c63852e85402eb93a73f7076d3e3d83f027": 3330,
       "0x8cc8d66eb5f1ff017a02b2aa27e0f385a941df83": 423,
       "0xad101d2d1a02a6a6f0eabc7fa6a98f0cb7bd5b08": 1214,
-      "0x8877522049675d2f504652a6aceb68860439190a": 918,
+      "0x8877522049675d2f504652a6aceb68860439190a": 923,
       "0x637e82909000b83081fe8f77afb0ea87c46fc71f": 729,
-      "0x7b80b53c8528aa775a49694dfe7fcd6e595ba019": 531,
-      "0xd7a330f4d2649cb2d07e3815cf5f7bb0012eb4c9": 414,
-      "0x7731193d889d0a731d3f289f79bf764faf0038af": 3064,
+      "0x7b80b53c8528aa775a49694dfe7fcd6e595ba019": 533,
+      "0xd7a330f4d2649cb2d07e3815cf5f7bb0012eb4c9": 418,
+      "0x7731193d889d0a731d3f289f79bf764faf0038af": 3071,
       "0x1067337988d2e7a2aacaf2a9d6c21ff7932af8fc": 24,
       "0x978fa2a33fea1ed3069e97db45d862b7a99e7991": 47,
       "0x77dbf05805e6d4de499de944323bd10f33678997": 237,
@@ -10036,74 +10036,74 @@
       "0x6f2df205f826752eafbfdfec66e5f24e585c20a1": 978,
       "0xfd113ffc572872a1f298876ba6b66337fe76fc83": 337,
       "0x4e99959817ddbc80e1b2ec42b35df99ee796c3c3": 461,
-      "0xcf816ce0e5bb63df34a7890a74f3bedc873eb4c7": 1880,
-      "0xb629a10bb3ca31596b9a6ebabd4f3a755868530b": 1667,
-      "0xf5e44f7cbd2c425901346b749ba9b9c1ab7c0884": 1056,
+      "0xcf816ce0e5bb63df34a7890a74f3bedc873eb4c7": 1882,
+      "0xb629a10bb3ca31596b9a6ebabd4f3a755868530b": 1669,
+      "0xf5e44f7cbd2c425901346b749ba9b9c1ab7c0884": 1057,
       "0xf2b98f3d6331a6115b7a87285577f4f655eca75a": 102,
-      "0x1588e15fd8ebe7a06bd00e9670530699909cd679": 579,
-      "0x39686eb0f6d6abb4e55297427687b13d256fae26": 2863,
-      "0x54c0e1987313a86f8b859b4058b60d99cac12db9": 969,
-      "0xbe4c1b29baadd3f7f5a12f1c45333cdd737e5d95": 567,
+      "0x1588e15fd8ebe7a06bd00e9670530699909cd679": 580,
+      "0x39686eb0f6d6abb4e55297427687b13d256fae26": 2872,
+      "0x54c0e1987313a86f8b859b4058b60d99cac12db9": 971,
+      "0xbe4c1b29baadd3f7f5a12f1c45333cdd737e5d95": 571,
       "0xeaa879183dc9b9955299d19d01e36a034a9324b7": 524,
-      "0xf56b5fede125344482e5398a6b9683eeac5ecdbc": 2166,
-      "0x716f912dc08b800db659da250e5c67c50376a99c": 546,
+      "0xf56b5fede125344482e5398a6b9683eeac5ecdbc": 2174,
+      "0x716f912dc08b800db659da250e5c67c50376a99c": 547,
       "0x2e653a478a251a442be9db58e203f706b1eab15a": 18,
-      "0xb1b7c184ec9cce81b5c846b5b0e3d4ab13439e4a": 134,
+      "0xb1b7c184ec9cce81b5c846b5b0e3d4ab13439e4a": 135,
       "0x8618f1eeb8a85c9a6c7fa8e911753628425eb43e": 108,
-      "0x41d0eda88d5c18ca26b3984240065fb28880f53d": 902,
+      "0x41d0eda88d5c18ca26b3984240065fb28880f53d": 904,
       "0xca5ede437b5d9e34045ab732eaeaff134f46f648": 161,
-      "0xebbd54697306d6ccfa4e006273998d96cb27264f": 1290,
+      "0xebbd54697306d6ccfa4e006273998d96cb27264f": 1296,
       "0x31600a9e8de349101181f854265ce8ef029ba559": 247,
-      "0x5a071de616320b44357834e8aff698648617c496": 716,
+      "0x5a071de616320b44357834e8aff698648617c496": 717,
       "0xa90f063b81a5c8b40eb4b969fa8c26ce75375bc8": 13,
       "0x67a85e9cd046a764c3cafec33ab72a1f85e67a48": 642,
-      "0xf4a1bd1b7ca9fc696a099104514c524aaf52c82d": 981,
+      "0xf4a1bd1b7ca9fc696a099104514c524aaf52c82d": 983,
       "0xbb92773334be0afb3ed51f2b05e27abbccd9ce1c": 204,
       "0xf7542d06c4f573f7eaa3843da299abea5eb9ecb2": 1021,
       "0xa9278a4113f5d239e76569fadc9cb71ee19c4451": 1203,
-      "0x42fb752e9cd5f37d121fd2038957fb4ca2e981df": 367,
-      "0xe560a7e287fd64f534dca46197b42d6c4b8a59fb": 610,
-      "0x68dfc0022433ece5392e540c595a466162bb2071": 468,
+      "0x42fb752e9cd5f37d121fd2038957fb4ca2e981df": 368,
+      "0xe560a7e287fd64f534dca46197b42d6c4b8a59fb": 612,
+      "0x68dfc0022433ece5392e540c595a466162bb2071": 475,
       "0x8542444bb2e15e8a3564a1a0b7bd615c69ea2429": 167,
-      "0x3aff1746fd7c8afe01870a109a576500052ed77d": 2506,
+      "0x3aff1746fd7c8afe01870a109a576500052ed77d": 2508,
       "0xd0870eb1380011aa4aa697d028539719489217c0": 495,
-      "0xa2ee7d4cf5541ff5799da48b470f4c6f60a524d6": 2364,
+      "0xa2ee7d4cf5541ff5799da48b470f4c6f60a524d6": 2367,
       "0x131d361bab7acaed6e194b8ea4ea1faea0215036": 229,
-      "0x7c459b8605987714b7ab2023d3a6d82157dcdb95": 787,
+      "0x7c459b8605987714b7ab2023d3a6d82157dcdb95": 788,
       "0x8905d0468d6932d9002d338d10df9c2f0e499e0b": 119,
       "0xfad87b578cb63ed077cc6b41dac8e63fd9f80161": 303,
       "0x7c8ecb4c0bf9cb65a090d67783b4093a65790de0": 88,
       "0x5904a4b1f933b8c150d496c6cc6373b708665145": 58,
-      "0x8425b338a3cc209e1238b68ba53f676b9165c441": 2395,
+      "0x8425b338a3cc209e1238b68ba53f676b9165c441": 2397,
       "0x6974f264a9487576b581ac3000cd12512488774b": 433,
       "0xfc8174fecc442764588223475c137e408b492853": 209,
       "0xe793cf9fb174d5a21cd118a48576fce48fe270ff": 1243,
-      "0x71446a79732dcbebab3cacca802e6f35eee5c583": 679,
+      "0x71446a79732dcbebab3cacca802e6f35eee5c583": 682,
       "0x10e6f5591dd7c5590516094324dfd0d2c5b731d0": 80,
       "0x7da56e6f877e123b86fb64bce0f594ed93c37aeb": 749,
       "0xa29d5edae355c5066ac2ea518cec5b7eba4a630a": 108,
-      "0xf37519b920b3c036ed8b772e028bd541f9c5e955": 850,
+      "0xf37519b920b3c036ed8b772e028bd541f9c5e955": 851,
       "0x60aa8d3da6f35a7f740aa076ef8a3746781647f2": 98,
       "0xcd1baca42a50ad2314908d827eeb658f2bca7cf0": 159,
       "0x4c2b434d36d4e9fd6b21bffd7b610ed22b1a15d2": 54,
       "0xfa2603f6f15905aa37acd9498679395098dcdd8f": 125,
-      "0xf4c0b2ecb1467fced4e679da10ddb31423783e86": 1701,
+      "0xf4c0b2ecb1467fced4e679da10ddb31423783e86": 1703,
       "0x14206d7547fab5fbcec73e28b3424eb8d58812f2": 685,
       "0xc96abec2de254066c88188eaa2656407288f2ffc": 192,
-      "0x2a8185d536526dcd61c0e526f1f48a95392003a0": 581,
+      "0x2a8185d536526dcd61c0e526f1f48a95392003a0": 583,
       "0x2732848700e0e5fbea362a92cd59a636e9af2ead": 22,
       "0x8092ba88b5b992b11f05cd37a73ac97582e6c79a": 340,
-      "0xe5b063de13016bfe6081dbc794b0e5a426a499e1": 519,
-      "0x32329ae674f1cccdbacd2cf10bb46d37f5be7d09": 705,
+      "0xe5b063de13016bfe6081dbc794b0e5a426a499e1": 521,
+      "0x32329ae674f1cccdbacd2cf10bb46d37f5be7d09": 706,
       "0xf9e6d82f19cd0981e71fe7a827b6bedadf471c24": 441,
       "0x8f30aa5055935517fd892d4b1dcd83daa0529ee7": 266,
       "0x2a71229486d3518ba3370063b3f3bde72402ce3f": 350,
       "0xd05cf1b5be0d621ff92a34b4b4c9393fa3d017f8": 100,
-      "0x9e3f8ea0f11c59a92857dc056834bc39787d4053": 985,
-      "0xc840b1d5b518f03474cee6196dc5377d5a39da30": 1024,
+      "0x9e3f8ea0f11c59a92857dc056834bc39787d4053": 988,
+      "0xc840b1d5b518f03474cee6196dc5377d5a39da30": 1025,
       "0xcb2a8c2cfb2a0954718eedbee605811a0352aabf": 1269,
       "0xa6168840208fefd405e50ddcc49be816d164bd17": 63,
-      "0x6dde98ad6008140b7ac2e9a7e6d3efeb08d5c38a": 340,
+      "0x6dde98ad6008140b7ac2e9a7e6d3efeb08d5c38a": 343,
       "0x2de071c888167e369511554ff8fcf260584bf2c5": 1009,
       "0xd897cd473cb369d22dc73c2f3ea6096691245777": 292,
       "0xdd2e4fedbabc76c84df238ef0aaa5192fa7a3f77": 252,
@@ -10117,7 +10117,7 @@
       "0xfde80ce523d7b6d9cc0219e83c2d5b2c3e19fcd8": 196,
       "0xf89a6bba75dffd1cd842f19c4ea873e1bc7aa0be": 305,
       "0x141d9102e15c1c93a4ac85a2765cc8bb0cf117d6": 319,
-      "0x4d22c68f996ed9abf0d1bb02ac070462a1b4e40e": 1494,
+      "0x4d22c68f996ed9abf0d1bb02ac070462a1b4e40e": 1495,
       "0x305ac018158d9f005d5fd1cd0e6f4b0fe96fbd67": 250,
       "0x88199c22a468c5972d0db24c01f205fb67dbab27": 113,
       "0x9e8ccf81b9cce7b0c35145fcb290d9bac67afcca": 164,
@@ -10125,7 +10125,7 @@
       "0xd01c5bfbdfde1518a23025e59ce2229f12a699f4": 308,
       "0x64fdd5f122583aebc0bf13e1719244e730226967": 144,
       "0x5e0d8580d86a03ae7594555cd3a1f75c2b279e54": 341,
-      "0x19145c9c75020282e72b29be14cec85b86f05096": 609,
+      "0x19145c9c75020282e72b29be14cec85b86f05096": 611,
       "0x46c4cbb738182fd78b308f10366a749db3753506": 242,
       "0xe42ea769ee93e6428ab66eaaaf3c4fef3bc3eab1": 60,
       "0xa8171af1c337edd4de1087db7d3a0d1b071ac466": 227,
@@ -10134,9 +10134,9 @@
       "0xe33a4e9b8c61d85faff3d4a8e16354394c2e466d": 317,
       "0x7d15e22e769a9e175e81ef531fa92f928bbed9e9": 59,
       "0x306cd87be0ddbee3ab4599b6130d76cb04943bae": 50,
-      "0x80393514ee660a8df8fcfcb928fdaaae9955f146": 453,
+      "0x80393514ee660a8df8fcfcb928fdaaae9955f146": 454,
       "0xc9114b998da0367772c216e97d7042740851eda3": 109,
-      "0x351dedd326478d6f1fedf6f74daf3694ca92a7ff": 911,
+      "0x351dedd326478d6f1fedf6f74daf3694ca92a7ff": 912,
       "0x33e12c09d38b2a55dcac517e5933af440aba1e52": 26,
       "0xf76c6d094cc80a7e2b207e223c9c9e10bf362234": 33,
       "0xd427790e9117f7b2cfdc85972f2a92dda0103905": 99,
@@ -10151,26 +10151,26 @@
       "0x5a308bccb95fae702da89a0cd2727b40a4ef3f5a": 169,
       "0xd077c2db0ca3ffec39421d269e0b9240a408843b": 191,
       "0xc95c805e1619407c674fef77cbfff3273b5be0a0": 40,
-      "0x60ee4d688c5c36c4e856da519617d9407189c80c": 1992,
+      "0x60ee4d688c5c36c4e856da519617d9407189c80c": 1994,
       "0x73e15ff38aee4f22a64d0906a9318825ddfded34": 79,
       "0x4f2a12dcf0bd35416c765c3ec7d49833d4429ee5": 29,
-      "0xf8f0d5ffee36e2a68d3ec7fc47d4b5113b7a5257": 766,
+      "0xf8f0d5ffee36e2a68d3ec7fc47d4b5113b7a5257": 773,
       "0xe7adbade6102623755354ac969ecb168c81ea718": 38,
       "0xd40a761f8d74b6a6613977a713a4192079bcad5c": 445,
       "0x280bffab953bc0cf469ee7b5902f4f6e220d26d1": 190,
       "0xf3c945fe15027a40ab8b3aedfef06233a489e952": 8,
-      "0x1fa1ec851ddbd6b4c84a337cc7fce687c65aafcb": 408,
+      "0x1fa1ec851ddbd6b4c84a337cc7fce687c65aafcb": 410,
       "0x90669c9364061461d67bbe3f602d9c94aea3f726": 17,
       "0x66272f77a8421955ebf24fe3d085a6abd5f73d9b": 517,
       "0x9dd841e11d20c8fc9346898ea6d7a61f8c26f759": 43,
-      "0xe2056fb27061e81c766341caebff924b3bd356e0": 309,
+      "0xe2056fb27061e81c766341caebff924b3bd356e0": 311,
       "0x5e4b896de537d090cc3477a5af4d673e4c8ca6bd": 38,
       "0x152a28c61e2af987473a8eb22d27b29f4befe7a4": 38,
       "0x04fea4e59421e6af9a1f64b8612666be0b918b8b": 25,
       "0x7af25530a0a1ad2a1b8151e81ffe40fba35896fa": 29,
       "0xbb70e2b67390d4648954f8319c7a403089035da8": 41,
       "0xb5bcc75e1b309cd55e21ae52f1a536be705edaf8": 460,
-      "0x595ecff8386128e889ed62949623de056180569b": 203,
+      "0x595ecff8386128e889ed62949623de056180569b": 204,
       "0xd8ec849dc8ed0130a2aa5c476967a454d44af965": 12,
       "0xe373f809daa1aae296ad42e9bc79530339c63bef": 15,
       "0xc0ac021fc7a645db6e0929bd234a37231a9b19e2": 12,
@@ -10186,10 +10186,10 @@
       "0xbb9378dd0adc91fe0b66b69cb2292bb8fecca723": 20,
       "0x5913dc17eb338ab595155a4c68b0f7b98e95f0a4": 594,
       "0x6cb99c1762df05d5b5b4bd957d6e83b2949c3302": 343,
-      "0x9b6f2ce6c53dffdcdc55b939511ebe1733c567a0": 117,
+      "0x9b6f2ce6c53dffdcdc55b939511ebe1733c567a0": 118,
       "0x6fbb90e5dda67c652b2271fb797cb13ad7c409c4": 379,
-      "0x89adede622ff4852a58275bf731ebb4987326b95": 517,
-      "0x6b3eca62c9442ffb3f5f187ab5531075fc15b3c3": 470,
+      "0x89adede622ff4852a58275bf731ebb4987326b95": 518,
+      "0x6b3eca62c9442ffb3f5f187ab5531075fc15b3c3": 471,
       "0x0ef5505832483589faf47fa5dfbd85639127cbc5": 126,
       "0xf0081bd591a71d9595bb05432a9109f0452c9a06": 45,
       "0xc6478c8730b1aa3679750b2c0863f2b44a61dc9d": 23,
@@ -10212,29 +10212,29 @@
       "0xf566f1253a16c9f6e5c90593a4f5e5027afe4cbd": 7,
       "0xfea1e5849f0010bcaf1ec80c5f304542b4eeefe6": 1,
       "0xc53e3179b1a9bddfd8e347255eabe69b32103f8f": 1,
-      "0x6513983b4f009aa28f1322a1463ee7464442e8f7": 602,
-      "0x27ffc959cb4dc7548572d2395933078fdb7acbad": 284,
+      "0x6513983b4f009aa28f1322a1463ee7464442e8f7": 610,
+      "0x27ffc959cb4dc7548572d2395933078fdb7acbad": 287,
       "0x027c13c89722209b60a9351973b7a8e54be0e99b": 224,
-      "0x2b6b38a4c2a737dc6aa26b0d204c9305ad3f428c": 194,
-      "0xb3346580b564d24a8596055fcfcc213a9efc2447": 495,
-      "0x81de00c8f9d19ab159c1ed41c555f5c0e8c9eba4": 1409,
+      "0x2b6b38a4c2a737dc6aa26b0d204c9305ad3f428c": 195,
+      "0xb3346580b564d24a8596055fcfcc213a9efc2447": 496,
+      "0x81de00c8f9d19ab159c1ed41c555f5c0e8c9eba4": 1411,
       "0x3b4553685f094e88c243aca630004c19b4567a7f": 1846,
-      "0xc91f92240d77d3c753b2c439054361ccd7977246": 361,
+      "0xc91f92240d77d3c753b2c439054361ccd7977246": 362,
       "0x1b856d8347386ae9ae73c950cd082b70f4a35b9b": 378,
       "0x0cb14c7c5c910766740bde567c231db0e533e70a": 367,
       "0xd7efa58b68fcf6ee240e2a804992e2d8343d85ea": 118,
       "0x3cf75b9179a1afb55c444beba80ef903785ac621": 375,
       "0x0b62903d561081d227d411206c4f075853a17a25": 56,
-      "0xc4b6a34881e8065ee9329456ec89f6deee0492bd": 265,
-      "0x8a71a496e570e56eac7461a0f1884224115f0b43": 531,
-      "0xb7bac01797414f9d3e5eaf185d56377257deb550": 664,
+      "0xc4b6a34881e8065ee9329456ec89f6deee0492bd": 266,
+      "0x8a71a496e570e56eac7461a0f1884224115f0b43": 532,
+      "0xb7bac01797414f9d3e5eaf185d56377257deb550": 665,
       "0x9fd648926f99a19432e49edb8b4a54bde65a07f9": 246,
-      "0xd30c3b8b3b14dd0462537eec59d11db19e895a8a": 486,
-      "0x4ad4efa871b9a9d943cd69fd779c4d0230eb021f": 11002,
+      "0xd30c3b8b3b14dd0462537eec59d11db19e895a8a": 487,
+      "0x4ad4efa871b9a9d943cd69fd779c4d0230eb021f": 11004,
       "0x7513e9fda4bb78f3f8c5a9fbd81008bca3642044": 63,
       "0x7640ecc5790eda660cc491e6ec38f0ee0418c78a": 95,
-      "0xc345d2177d8dc930b2133144fd4d8623b4857cf0": 97,
-      "0xee47d721bed55af1472af8b6727feeb771a20dcd": 591,
+      "0xc345d2177d8dc930b2133144fd4d8623b4857cf0": 100,
+      "0xee47d721bed55af1472af8b6727feeb771a20dcd": 594,
       "0xd96fab64050cb855b3fd868af00d23c497802fc3": 743,
       "0x70a0b4f29671bef57fdbc2d13a47e0c37dd1c545": 17,
       "0xba6eb132790b8490dd6262c29689e0669765347c": 36,
@@ -10255,8 +10255,8 @@
       "0xfee740822264cf36e4e7b5c039c1f8aebfa8b587": 1
     },
     "42161": {
-      "0x97ce25c7a6662f682bd60e6dcd1b492d6520cb40": 137,
-      "0x34876c6502401db373ee5f4ec5ff85f229bdb05b": 85,
+      "0x97ce25c7a6662f682bd60e6dcd1b492d6520cb40": 138,
+      "0x34876c6502401db373ee5f4ec5ff85f229bdb05b": 86,
       "0x7cc30b237b48f5f05d29b602309d6673e4d7a272": 84,
       "0x77cabdc9a856a5600027534a36bc84acab1c0b4e": 92,
       "0x9345b589ecc7fa9e39d0dd80fa50ec28439cd97a": 20,
@@ -10286,7 +10286,7 @@
       "0x3629b01676ca4a9dc90220b00dee5b68ef5d2fad": 1,
       "0xf670c8744731ff53e9276401fc2970bbbb67eae5": 6,
       "0x0719fe2f118c454c711c682a6b961cee375ad891": 796,
-      "0x5ce92721e12e74c7a2811c521922da5a3b185a4e": 630,
+      "0x5ce92721e12e74c7a2811c521922da5a3b185a4e": 631,
       "0x2e53d46deade4c968a2496b74c2132121d9a7d87": 636,
       "0xa7f4407e123c5fe5b136c8213b8c24908fd1c567": 534,
       "0x82edf982427e4d7e2bd06650ae57ba59f84afd8e": 494,
@@ -10297,11 +10297,11 @@
       "0x99cdc7650da1ca7db33ae405bfe52c61679c9a49": 7,
       "0xd03949ba6f6777a70bac9d41bc7d224b1d083a3d": 93,
       "0xb9a876772f9b4ae2229f78c27331a8ae9d07a5bd": 46,
-      "0x693ba7da5cdcdf1fa48815f63c9df36ca6863231": 203,
+      "0x693ba7da5cdcdf1fa48815f63c9df36ca6863231": 207,
       "0x15b8b66c3445ab6bf45817620b11bde7752d913c": 1,
       "0x5aab09d899596f33fc256db45f22b6d3f0fec67b": 116,
-      "0xa6979916390d2e1225bc3c44504710af0833687e": 65,
-      "0xf37d23a68a6395676b0e4839f1b92abe0f235998": 48,
+      "0xa6979916390d2e1225bc3c44504710af0833687e": 66,
+      "0xf37d23a68a6395676b0e4839f1b92abe0f235998": 49,
       "0x466c0b9077ade5394ba014a53e28308fcf9b2866": 5,
       "0x8de2ca38f2a99761eaacceeb4d334f83032c124a": 30,
       "0x4108548b95cd6cbdd5dfbe492ba85490e86de0eb": 16,
